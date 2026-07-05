@@ -1,5 +1,7 @@
 import type { Profile } from "@/types";
 
+const basePath = process.env.NODE_ENV === "production" ? "/portfolio" : "";
+
 export const profile: Profile = {
   name: "Yash Savaliya",
   title: "Full Stack .NET Developer",
@@ -11,7 +13,7 @@ export const profile: Profile = {
     "Full Stack .NET Developer with 2+ years of experience building scalable SaaS platforms, incident management systems, and payment processing solutions using ASP.NET Core, Angular, and Azure.",
   about:
     "Full Stack .NET Developer with 2+ years of experience building and maintaining production-grade SaaS applications using ASP.NET Core, Angular, SQL Server, and Azure. Experienced in developing secure, scalable web applications, REST APIs, authentication systems, and event-driven backend solutions using CQRS, MediatR, Redis, and RabbitMQ. Strong background in incident management, payment processing, performance optimization, and multi-tenant SaaS platforms. Seeking opportunities to contribute to high-scale product and enterprise applications.",
-  avatar: "/avatar.jpg",
+  avatar: `${basePath}/avatar.jpg`,
   location: "Ahmedabad, Gujarat, India",
-  resumeUrl: "resume.pdf",
+  resumeUrl: `${basePath}/resume.pdf`,
 };
