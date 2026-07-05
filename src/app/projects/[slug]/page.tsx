@@ -91,7 +91,19 @@ export default async function ProjectPage({ params }: Props) {
             {project.technologies.map((tech) => (
               <span
                 key={tech}
-                className="rounded-full bg-primary/10 px-3 py-1 text-xs text-primary"
+                className="
+                  inline-flex items-center
+                  rounded-full
+                  border border-primary/20
+                  bg-primary/5
+                  px-3 py-1.5
+                  text-xs font-medium
+                  text-primary
+                  whitespace-nowrap
+                  transition-all
+                  hover:border-primary/40
+                  hover:bg-primary/10
+                "
               >
                 {tech}
               </span>
