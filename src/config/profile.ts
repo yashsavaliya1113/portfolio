@@ -13,5 +13,5 @@ export const profile: Profile = {
     "Full Stack .NET Developer with 2+ years of experience building and maintaining production-grade SaaS applications using ASP.NET Core, Angular, SQL Server, and Azure. Experienced in developing secure, scalable web applications, REST APIs, authentication systems, and event-driven backend solutions using CQRS, MediatR, Redis, and RabbitMQ. Strong background in incident management, payment processing, performance optimization, and multi-tenant SaaS platforms. Seeking opportunities to contribute to high-scale product and enterprise applications.",
   avatar: "/avatar.jpg",
   location: "Ahmedabad, Gujarat, India",
-  resumeUrl: "portfolio/resume.pdf",
+  resumeUrl: "resume.pdf",
 };
