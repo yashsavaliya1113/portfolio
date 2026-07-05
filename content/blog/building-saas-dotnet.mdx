@@ -1,0 +1,48 @@
+---
+title: "Building Multi-Tenant SaaS with ASP.NET Core"
+description: "A deep dive into designing and building scalable multi-tenant SaaS platforms using ASP.NET Core, covering tenant isolation, billing, and RBAC."
+date: "2025-12-15"
+tags: [".NET", "SaaS", "Architecture", "ASP.NET Core"]
+category: "Engineering"
+published: true
+---
+
+# Building Multi-Tenant SaaS with ASP.NET Core
+
+Building a multi-tenant SaaS platform comes with unique architectural challenges. In this post, I'll share patterns I've used in production.
+
+## Tenant Isolation Strategies
+
+There are three main approaches to tenant isolation:
+
+1. **Shared Database, Shared Schema** — Simplest but lowest isolation
+2. **Shared Database, Separate Schema** — Good balance
+3. **Separate Database** — Maximum isolation, higher cost
+
+For most SaaS applications, starting with a shared database with a tenant context filter works well.
+
+## Implementation
+
+```csharp
+public class TenantDbContext : DbContext
+{
+    private readonly Guid _tenantId;
+
+    public TenantDbContext(DbContextOptions options, ITenantService tenantService)
+        : base(options)
+    {
+        _tenantId = tenantService.GetCurrentTenantId();
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Customer>().HasQueryFilter(c => c.TenantId == _tenantId);
+    }
+}
+```
+
+## Key Takeaways
+
+- Always design for tenant isolation from day one
+- Use the outbox pattern for cross-tenant operations
+- Cache tenant configuration aggressively

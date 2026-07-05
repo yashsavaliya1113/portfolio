@@ -1,0 +1,33 @@
+# Yash Savaliya — Full Stack .NET Developer
+
+## About
+Full Stack .NET Developer with 2+ years of experience building production-grade SaaS applications using ASP.NET Core, Angular, SQL Server, and Azure. Experienced in incident management, payment processing, performance optimization, and multi-tenant SaaS platforms. Currently exploring Agentic AI with Semantic Kernel and Azure OpenAI.
+
+## Contact
+- Email: tpyashsavaliya13092002@gmail.com
+- LinkedIn: https://www.linkedin.com/in/yash-savaliya-70989a1b4/
+- GitHub: https://github.com/yashsavaliya
+- Location: Ahmedabad, Gujarat, India
+
+## Technical Skills
+- Backend: C#, ASP.NET Core (.NET 6/8/10), Web API, MVC, Entity Framework Core, LINQ, CQRS, MediatR, Clean Architecture, .NET Aspire
+- Frontend: Angular 14, Blazor, TypeScript
+- Architecture: Microservices, CQRS, Event-Driven Architecture, Outbox Pattern
+- Cloud & DevOps: Microsoft Azure, Azure AD, Azure Blob Storage, Azure App Service, IIS
+- Databases: SQL Server, Azure SQL, Oracle, Redis, RabbitMQ
+- Security: Keycloak, JWT, RBAC, HMAC, OAuth 2.0, Azure AD B2C, Veriff KYC
+- AI: Azure OpenAI, Semantic Kernel, RAG Pipeline Design
+
+## Experience
+### iTechOps — Full Stack Developer (Nov 2024 – Present)
+- Architected backend modules for white-label SaaS monitoring platform, reducing incident downtime from 30+ min to under 5 min
+- Designed alert-processing engine handling 14,000+ alerts/month with throttling and retry policies
+- Improved API/database performance by ~30% through EF Core optimization
+- Implemented multi-tenant auth and RBAC using Keycloak, JWT, and Azure AD
+
+## Key Projects
+1. Incident Management Platform — White-label SaaS status page (ASP.NET Core MVC, .NET 8, Azure SQL, ChartJS)
+2. Payment Gateway — FinTech SaaS platform (.NET 10 Aspire, Blazor, CQRS, Redis, RabbitMQ, Veriff, SaltEdge)
+
+## Education
+B.Tech in Information Technology, RK University, Rajkot — CGPA: 7.49/10.0
