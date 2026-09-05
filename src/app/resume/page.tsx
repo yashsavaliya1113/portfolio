@@ -39,7 +39,7 @@ export default function ResumePage() {
                 LinkedIn
               </a>
               <span>{profile.location}</span>
-              <span>+91-81040 17448</span>
+              <span>+91-8104017448</span>
             </div>
           </div>
 

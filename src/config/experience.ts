@@ -7,12 +7,14 @@ export const experiences: Experience[] = [
     period: "November 2024 – Present",
     location: "Ahmedabad, Gujarat, India",
     description:
-      "Building and maintaining backend modules for a white-label SaaS monitoring platform serving multiple enterprise clients.",
+      "Building and maintaining production SaaS platforms across monitoring, assessment, and payment domains for multiple enterprise clients.",
     achievements: [
+      "Joined as a Software Development Intern (July 2024 – November 2024), delivering SaaS module development and bug fixes before converting to full-time.",
       "Architected and owned backend modules for a white-label SaaS monitoring platform, reducing average incident downtime from 30+ min to under 5 min (6× MTTR improvement) across multiple enterprise clients.",
       "Designed extensible alert-processing engine with pluggable notification providers (Email, Slack, MS Teams), reliably handling 14,000+ alerts/month with built-in throttling, retry policies, and failure-handling to prevent notification floods.",
       "Improved API and database performance by ~30% through EF Core query optimization, strategic indexing, and N+1 elimination across multi-tenant SaaS workloads.",
       "Implemented multi-tenant auth and RBAC using Keycloak, JWT, and Azure AD — securing role-based access across 5+ enterprise SaaS clients.",
+      "Built Angular micro-frontend modules and Blazor interfaces, integrating them with secured ASP.NET Core Web APIs and GraphQL endpoints.",
       "Resolved production incidents (alert misfires, IIS deployment failures, DB deadlocks) with root cause analysis and zero client SLA breaches.",
     ],
     technologies: [

@@ -2,6 +2,64 @@ import type { Project } from "@/types";
 
 export const projects: Project[] = [
   {
+    slug: "white-label-assessment-platform",
+    title: "White-Label Assessment Platform",
+    description:
+      "Multi-tenant assessment SaaS platform with .NET microservices and Angular micro-frontends.",
+    fullDescription:
+      "A distributed assessment platform built for vendor partners to rebrand and resell with complete tenant and renderer isolation. The system combines .NET 10 Clean Architecture microservices, GraphQL APIs, and Angular micro-frontends in a shared shell.",
+    image: "/projects/assessment.png",
+    screenshots: [],
+    technologies: [
+      ".NET 10",
+      "GraphQL (HotChocolate)",
+      "Clean Architecture",
+      "Microservices",
+      "Angular 22",
+      "Module Federation",
+      "JWT",
+    ],
+    categories: ["SaaS", "Assessments", "Microservices"],
+    links: {
+      caseStudy: "/projects/white-label-assessment-platform",
+    },
+    featured: true,
+    problem:
+      "Vendor partners needed to deliver branded assessment experiences while keeping tenant data, identity, and renderer configuration fully isolated.",
+    architecture:
+      ".NET 10 Clean Architecture microservices expose GraphQL APIs through HotChocolate, with a REST credit-ledger service and Angular micro-frontends composed by a shared shell.",
+    features: [
+      "Distributed assessment services with Clean Architecture boundaries",
+      "GraphQL APIs through HotChocolate plus a REST credit-ledger service",
+      "Angular 22 micro-frontends composed with Module Federation",
+      "Shared singleton services for authentication tokens and tenant branding",
+      "Centralized Identity Service with JWT authentication",
+      "Per-tenant and renderer isolation for vendor rebranding",
+    ],
+    databaseDesign:
+      "Tenant-aware persistence boundaries support isolated assessment data and credit-ledger operations.",
+    apiDesign:
+      "GraphQL APIs provide flexible assessment operations while the credit ledger remains exposed through a focused REST service.",
+    challenges: [
+      "Maintaining tenant and renderer isolation across distributed services and independently deployed frontends",
+      "Sharing authentication and branding state across Module Federation remotes without duplicating runtime services",
+    ],
+    lessonsLearned: [
+      "A shared frontend shell and centralized identity boundary simplify consistent tenant experiences across independently deployed modules.",
+    ],
+    futureImprovements: [
+      "Expand assessment analytics and reporting workflows",
+      "Add automated tenant onboarding and branding configuration",
+    ],
+    timeline: "In progress",
+    metrics: [
+      { label: "Runtime", value: ".NET 10" },
+      { label: "Frontend", value: "Angular 22" },
+      { label: "API Style", value: "GraphQL + REST" },
+    ],
+    status: "in-progress",
+  },
+  {
     slug: "incident-management-platform",
     title: "Incident Management Platform",
     description:
@@ -76,6 +134,8 @@ export const projects: Project[] = [
       "Blazor",
       "MediatR",
       "CQRS",
+      "ASP.NET Aspire",
+      "PostgreSQL",
       "HMAC",
       "Redis",
       "RabbitMQ",
@@ -83,7 +143,11 @@ export const projects: Project[] = [
       "Veriff",
       "Azure Blob Storage",
       "Keycloak",
-      "Azure AD",
+      "Docker",
+      "Azure Container Apps",
+      "Bicep",
+      "OpenTelemetry",
+      "MSTest",
     ],
     categories: ["FinTech", "Payments", "SaaS"],
     links: {},
