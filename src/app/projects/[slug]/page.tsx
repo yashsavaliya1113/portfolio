@@ -25,10 +25,17 @@ export async function generateMetadata({ params }: Props) {
     openGraph: {
       title: `${project.title} — Projects`,
       description: project.description,
-      images: [{ url: "/og.png", width: 1200, height: 630, alt: project.title }],
+      url: `${siteConfig.url}/projects/${slug}`,
+      images: [{ url: `${siteConfig.url}/og.png`, width: 1200, height: 630, alt: project.title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${project.title} — Projects`,
+      description: project.description,
+      images: [`${siteConfig.url}/og.png`],
     },
     alternates: {
-      canonical: `/projects/${slug}`,
+      canonical: `${siteConfig.url}/projects/${slug}`,
     },
     keywords: [...project.technologies, ...project.categories, "portfolio", "project"],
   };

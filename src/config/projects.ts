@@ -150,7 +150,9 @@ export const projects: Project[] = [
       "MSTest",
     ],
     categories: ["FinTech", "Payments", "SaaS"],
-    links: {},
+    links: {
+      caseStudy: "/projects/payment-gateway",
+    },
     featured: true,
     problem:
       "Business needed a unified payment platform supporting open banking, KYC verification, and dual-portal architecture (customer + back-office) with distributed reliability guarantees.",

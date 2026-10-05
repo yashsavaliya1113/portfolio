@@ -56,11 +56,20 @@ export function Hero() {
           <div className="hidden animate-scale-in lg:block" style={{ animationDelay: "0.3s" }}>
             <div className="relative mx-auto aspect-square max-w-md">
               <div className="flex h-full w-full items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-[var(--color-border)] overflow-hidden">
-                <img
-                  src={profile.avatar}
-                  alt={`${profile.name} — Full Stack .NET Developer`}
-                  className="h-full w-full object-cover"
-                />
+                <picture>
+                  {profile.avatarWebp && (
+                    <source srcSet={profile.avatarWebp} type="image/webp" />
+                  )}
+                  <img
+                    src={profile.avatar}
+                    alt={`${profile.name} — Full Stack .NET Developer`}
+                    width={400}
+                    height={400}
+                    fetchPriority="high"
+                    decoding="async"
+                    className="h-full w-full object-cover"
+                  />
+                </picture>
               </div>
             </div>
           </div>

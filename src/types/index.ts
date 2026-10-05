@@ -13,6 +13,7 @@ export interface Profile {
   heroDescription: string;
   about: string;
   avatar: string;
+  avatarWebp?: string;
   location: string;
   resumeUrl: string;
 }

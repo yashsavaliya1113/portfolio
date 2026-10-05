@@ -26,17 +26,20 @@ export async function generateMetadata({ params }: Props) {
       title: `${post.title} — Blog`,
       description: post.description,
       type: "article",
+      url: `${siteConfig.url}/blog/${slug}`,
       publishedTime: post.date,
       authors: ["Yash Savaliya"],
       tags: post.tags,
-      images: [{ url: "/og.png", width: 1200, height: 630, alt: post.title }],
+      images: [{ url: `${siteConfig.url}/og.png`, width: 1200, height: 630, alt: post.title }],
     },
     twitter: {
+      card: "summary_large_image",
       title: `${post.title} — Blog`,
       description: post.description,
+      images: [`${siteConfig.url}/og.png`],
     },
     alternates: {
-      canonical: `/blog/${slug}`,
+      canonical: `${siteConfig.url}/blog/${slug}`,
     },
     keywords: [...post.tags, post.category, ".NET", "ASP.NET Core", "SaaS"],
   };

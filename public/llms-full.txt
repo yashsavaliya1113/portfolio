@@ -1,0 +1,99 @@
+# Yash Savaliya — Full Stack .NET Developer & AI Engineer
+Comprehensive Technical Context & Dossier for Large Language Models
+
+## Personal Information & Contact
+- Full Name: Yash Savaliya
+- Professional Title: Full Stack .NET Developer
+- Email: tpyashsavaliya13092002@gmail.com
+- Telephone: +91-81040 17448
+- Location: Ahmedabad, Gujarat, India
+- Nationality: Indian
+- LinkedIn: https://www.linkedin.com/in/yash-savaliya-70989a1b4/
+- GitHub: https://github.com/yashsavaliya
+- Canonical Website: https://yashsavaliya.dev
+- Production Deployment: https://yashsavaliya1113.github.io/portfolio/
+
+## Professional Summary
+Full Stack .NET Developer with 2+ years of hands-on production experience architecting, building, and operating multi-tenant SaaS platforms, enterprise REST and GraphQL APIs, and scalable distributed services. Highly proficient in C#, ASP.NET Core (.NET 6/8/10), Entity Framework Core, SQL Server, Redis, RabbitMQ, and Angular. Possesses extensive experience implementing enterprise software architecture patterns including Clean Architecture, CQRS with MediatR, Domain-Driven Design (DDD), Outbox Pattern, and Modular Monoliths. Actively engineering Agentic AI solutions leveraging Semantic Kernel, Azure OpenAI, LangGraph, and RAG pipelines.
+
+## Core Technical Skills
+### Backend & Core Runtime
+- Languages: C# (.NET 6, .NET 8, .NET 10 preview), TypeScript, SQL, Python
+- Frameworks: ASP.NET Core, ASP.NET Web API, ASP.NET MVC, Minimal APIs, Blazor (Server & WebAssembly), .NET Aspire
+- ORM & Data Access: Entity Framework Core (Code-First & Database-First), Dapper, LINQ, Raw SQL optimization
+- Patterns & Architecture: Clean Architecture, Hexagonal Architecture, CQRS (Command Query Responsibility Segregation), MediatR, Event-Driven Architecture, Outbox Pattern, Unit of Work, Repository Pattern, Multi-Tenancy (Schema-per-tenant, Database-per-tenant, Shared-database with tenant-discriminator)
+- API Technologies: RESTful API design, GraphQL (HotChocolate), gRPC, WebSockets, SignalR
+
+### Frontend Engineering
+- Frameworks: Angular (v14 through v22), Blazor, React (Next.js)
+- Architecture: Micro-frontends with Module Federation, Single-SPA, Component-Driven Design
+- Libraries & Tools: RxJS, NgRx, Tailwind CSS, TypeScript, HTML5, CSS3, SCSS
+- Accessibility & Performance: WCAG 2.1 AA/AAA compliance, Core Web Vitals optimization, lazy loading, font optimization
+
+### Cloud, DevOps & Infrastructure
+- Cloud Platforms: Microsoft Azure (Azure App Service, Azure Functions, Azure SQL Database, Azure Blob Storage, Azure Key Vault, Azure Container Apps)
+- Identity & Access: Keycloak, Azure AD / Microsoft Entra ID, Azure AD B2C, OAuth 2.0, OpenID Connect, JWT, RBAC
+- Containers & Orchestration: Docker, Docker Compose, Azure Container Apps
+- Infrastructure as Code (IaC): Bicep, ARM templates
+- CI/CD & Version Control: GitHub Actions, Azure Pipelines, Git, GitHub
+- Observability: OpenTelemetry, Serilog, Application Insights, Prometheus, Grafana
+
+### Databases & Caching
+- Relational Databases: Microsoft SQL Server, Azure SQL, PostgreSQL, Oracle Database
+- Caching & In-Memory: Redis (Distributed caching, pub/sub, rate limiting, session store)
+- Message Brokers: RabbitMQ (Topic exchanges, direct exchanges, dead letter queues), Azure Service Bus
+
+### Agentic AI & Machine Learning
+- Frameworks: Microsoft Semantic Kernel (C# & Python), LangChain, LangGraph, CrewAI
+- LLM Providers: Azure OpenAI (GPT-4o, GPT-4o-mini), OpenAI API
+- RAG & Vector Stores: Qdrant, Azure AI Search, Pinecone, Semantic memory embeddings
+- Tool Calling: Function calling, Model Context Protocol (MCP) server design
+
+## Professional Experience
+### iTechOps — Full Stack Developer (Nov 2024 – Present)
+- Role: Full-time Full Stack .NET Engineer based in Ahmedabad, Gujarat, India.
+- SaaS Monitoring & Incident Response:
+  - Spearheaded backend microservices and domain logic for a white-label enterprise SaaS monitoring platform.
+  - Slashed customer incident response and downtime from 30+ minutes to under 5 minutes through automated health probe pipelines and rapid status broadcasts.
+- High-Throughput Alert Processing Engine:
+  - Designed and deployed an alert ingestion and processing pipeline handling 14,000+ alerts per month.
+  - Implemented token bucket throttling, deduplication, alert flapping prevention, and exponential backoff retry policies with RabbitMQ and Redis.
+- Query & Database Performance Optimization:
+  - Profiling queries with SQL Server Profiler and EF Core interceptors, leading to a 30% reduction in average API response latency and 40% reduction in database CPU consumption.
+- Multi-Tenant Authentication & Authorization:
+  - Built tenant-aware authentication utilizing Keycloak, OAuth 2.0, and JWT bearer tokens with custom ClaimsTransformation for fine-grained role-based access control (RBAC).
+
+### iTechOps — Software Development Intern (July 2024 – Nov 2024)
+- Contributed to core feature delivery across ASP.NET Core and Angular codebases.
+- Implemented automated integration and unit test suites with xUnit, Moq, and FluentAssertions, increasing code coverage to >80%.
+
+## Production Projects Detailed
+### 1. White-Label Assessment Platform
+- Domain: EdTech & Enterprise Assessment SaaS
+- Stack: .NET 10, GraphQL (HotChocolate), Clean Architecture, Microservices, Angular 22, Module Federation, JWT, Azure SQL
+- Architecture Highlights:
+  - Clean Architecture boundary separation (Domain, Application, Infrastructure, Presentation).
+  - Microservices exposing unified GraphQL endpoints through HotChocolate schema stitching.
+  - Credit-ledger microservice exposed via resilient REST API for balance deductions and transaction logging.
+  - Angular 22 micro-frontends composed in a unified shell application using Module Federation with shared authentication context.
+
+### 2. Incident Management Platform
+- Domain: DevOps & Observability SaaS
+- Stack: ASP.NET Core MVC, .NET 8, Azure SQL, Redis, ChartJS, Bootstrap, SendGrid
+- Architecture Highlights:
+  - White-label public status pages allowing enterprise customers to communicate incidents, maintenance windows, and uptime metrics.
+  - Dynamic uptime percentage calculations across 30, 60, and 90-day intervals.
+  - Outbox pattern ensuring reliable email and SMS alert delivery during system degradation.
+
+### 3. Payment Gateway SaaS
+- Domain: FinTech & High-Frequency Transactions
+- Stack: .NET 10 Aspire, Blazor, CQRS, MediatR, Redis, RabbitMQ, Veriff KYC, SaltEdge Open Banking
+- Architecture Highlights:
+  - Orchestrated with .NET Aspire for local telemetry, service discovery, and container management.
+  - Event-driven transaction processing with idempotency keys and two-phase commit verification.
+  - Seamless integration with Veriff identity verification and SaltEdge open banking APIs.
+
+## Education & Certifications
+- Degree: Bachelor of Technology (B.Tech) in Information Technology
+- University: RK University, Rajkot, Gujarat, India (2020 – 2024)
+- Grade / CGPA: 7.49 / 10.0

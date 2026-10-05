@@ -11,6 +11,7 @@ export function useScrollProgress() {
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
       setProgress(docHeight > 0 ? scrollTop / docHeight : 0);
     };
+    update();
     window.addEventListener("scroll", update, { passive: true });
     return () => window.removeEventListener("scroll", update);
   }, []);
