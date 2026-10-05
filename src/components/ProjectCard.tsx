@@ -28,16 +28,23 @@ export function ProjectCard({ project, index }: Props) {
         <p className="mt-2 line-clamp-2 text-sm text-[var(--color-muted)]">
           {project.description}
         </p>
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {project.technologies.map((tech) => (
+        <div className="mt-3 flex flex-wrap items-center gap-1.5">
+          {project.technologies.slice(0, 5).map((tech) => (
             <span
               key={tech}
-              className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-bg)] px-2.5 py-0.5 text-xs font-medium"
+              className="inline-flex items-center rounded-md border border-[var(--color-border)] bg-[var(--color-bg)]/80 px-2 py-0.5 text-xs font-mono text-[var(--color-muted)] transition-colors hover:border-primary/40 hover:text-[var(--color-text)]"
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-primary/40" />
               {tech}
             </span>
           ))}
+          {project.technologies.length > 5 && (
+            <span
+              title={project.technologies.slice(5).join(", ")}
+              className="inline-flex items-center rounded-md border border-primary/25 bg-primary/10 px-1.5 py-0.5 text-xs font-mono font-medium text-primary"
+            >
+              +{project.technologies.length - 5}
+            </span>
+          )}
         </div>
         <div className="mt-4 flex items-center gap-3">
           {project.links.github && (

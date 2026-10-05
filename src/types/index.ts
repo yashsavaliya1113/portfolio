@@ -3,6 +3,7 @@ export interface SiteConfig {
   description: string;
   url: string;
   ogImage: string;
+  googleAnalyticsId?: string;
   links: { github: string; linkedin: string; email: string };
 }
 
