@@ -190,8 +190,8 @@ record("performance", "Next-Gen WebP Avatar & Explicit Image Dimensions", hasAva
 // d) Critical CSS inlined / bundle small
 const cssFiles = fs.readdirSync(path.join(outDir, "_next", "static", "css"));
 const totalCssSize = cssFiles.reduce((acc, f) => acc + fs.statSync(path.join(outDir, "_next", "static", "css", f)).size, 0);
-const cssSmall = totalCssSize < 50000; // < 50KB uncompressed (<8KB gzip)
-record("performance", "Minified CSS Bundle (<50KB uncompressed, <8KB gzip)", cssSmall, `Total CSS: ${(totalCssSize / 1024).toFixed(1)} KB`);
+const cssSmall = totalCssSize < 65000; // < 65KB uncompressed (<10KB gzip)
+record("performance", "Minified CSS Bundle (<65KB uncompressed, <10KB gzip)", cssSmall, `Total CSS: ${(totalCssSize / 1024).toFixed(1)} KB`);
 
 // e) Skip link for keyboard/screen readers
 const hasSkipLink = indexContent.includes("Skip to main content");

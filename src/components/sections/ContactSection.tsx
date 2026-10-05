@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowUpRight, FileDown, Mail, MapPin, Phone, Check } from "lucide-react";
+import { ArrowUpRight, FileDown, Mail, MapPin, Phone, Check, Copy } from "lucide-react";
 import { SectionHeading } from "@/components/SectionHeading";
 import { Loader } from "@/components/Loader";
 import { useToast } from "@/components/Toaster";
@@ -11,6 +11,14 @@ import { profile } from "@/config/profile";
 export function ContactSection() {
   const { toast } = useToast();
   const [sending, setSending] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyEmail = () => {
+    navigator.clipboard.writeText(siteConfig.links.email);
+    setCopied(true);
+    toast("Email copied to clipboard!", "success");
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <section id="contact" className="border-t border-[var(--color-border)] py-20">
@@ -79,6 +87,14 @@ export function ContactSection() {
                 <FileDown size={14} />
                 Download Resume
               </a>
+              <button
+                type="button"
+                onClick={handleCopyEmail}
+                className="inline-flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-2.5 text-sm font-medium transition-all hover:border-primary/50"
+              >
+                {copied ? <Check size={14} className="text-success" /> : <Copy size={14} />}
+                {copied ? "Copied" : "Copy Email"}
+              </button>
             </div>
           </div>
           <div className="animate-fade-up rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6" style={{ animationDelay: "0.2s", animationFillMode: "both" }}>

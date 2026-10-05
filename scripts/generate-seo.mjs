@@ -1,13 +1,16 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import matter from "gray-matter";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.join(__dirname, "..");
 const outDir = path.join(rootDir, "out");
 const publicDir = path.join(rootDir, "public");
+const blogDir = path.join(rootDir, "content", "blog");
+const projectsFile = path.join(rootDir, "src", "config", "projects.ts");
 
-const siteUrl = "https://yashsavaliya.dev";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://yashsavaliya.dev";
 
 const staticPages = [
   { url: "/", priority: 1.0, changefreq: "weekly" },
@@ -16,13 +19,38 @@ const staticPages = [
   { url: "/resume", priority: 0.7, changefreq: "monthly" },
 ];
 
-const projects = [
-  { slug: "white-label-assessment-platform" },
-  { slug: "incident-management-platform" },
-  { slug: "payment-gateway" },
-];
+// Dynamically extract projects
+let projects = [];
+if (fs.existsSync(projectsFile)) {
+  const content = fs.readFileSync(projectsFile, "utf-8");
+  const slugMatches = [...content.matchAll(/slug:\s*["']([^"']+)["']/g)];
+  projects = slugMatches.map((m) => ({ slug: m[1] }));
+}
+if (projects.length === 0) {
+  projects = [
+    { slug: "white-label-assessment-platform" },
+    { slug: "incident-management-platform" },
+    { slug: "payment-gateway" },
+  ];
+}
 
-const blogPosts = [{ slug: "building-saas-dotnet", date: "2025-12-15" }];
+// Dynamically extract blog posts
+let blogPosts = [];
+if (fs.existsSync(blogDir)) {
+  const files = fs.readdirSync(blogDir).filter((f) => f.endsWith(".mdx") || f.endsWith(".md"));
+  blogPosts = files.map((file) => {
+    const raw = fs.readFileSync(path.join(blogDir, file), "utf-8");
+    const { data } = matter(raw);
+    return {
+      slug: file.replace(/\.mdx?$/, ""),
+      title: data.title || file.replace(/\.mdx?$/, ""),
+      description: data.description || "",
+      date: data.date || new Date().toISOString().split("T")[0],
+      category: data.category || "Engineering",
+      published: data.published !== false,
+    };
+  }).filter((p) => p.published);
+}
 
 const urls = [
   ...staticPages,
@@ -59,18 +87,18 @@ if (!fs.existsSync(outDir)) {
 }
 
 fs.writeFileSync(path.join(outDir, "sitemap.xml"), sitemap);
-console.log("✓ Generated sitemap.xml");
+console.log("✓ Generated dynamic sitemap.xml");
 
 // Generate rss.xml
 const rssItems = blogPosts
   .map(
     (post) => `    <item>
-      <title>Building Multi-Tenant SaaS with ASP.NET Core</title>
-      <description>A deep dive into designing and building scalable multi-tenant SaaS platforms using ASP.NET Core.</description>
+      <title>${post.title.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</title>
+      <description>${post.description.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</description>
       <link>${siteUrl}/blog/${post.slug}</link>
       <guid>${siteUrl}/blog/${post.slug}</guid>
       <pubDate>${new Date(post.date).toUTCString()}</pubDate>
-      <category>Engineering</category>
+      <category>${post.category}</category>
     </item>`,
   )
   .join("\n");
@@ -89,7 +117,7 @@ ${rssItems}
 </rss>`;
 
 fs.writeFileSync(path.join(outDir, "rss.xml"), rss);
-console.log("✓ Generated rss.xml");
+console.log("✓ Generated dynamic rss.xml");
 
 // Copy public SEO/GEO files to out/
 const filesToCopy = [

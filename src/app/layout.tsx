@@ -1,10 +1,30 @@
 import type { Metadata, Viewport } from "next";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ToastProvider } from "@/components/Toaster";
 import { siteConfig } from "@/config/site";
 import { profile } from "@/config/profile";
 import "@/styles/globals.css";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+});
+
+const basePath =
+  process.env.NEXT_PUBLIC_BASE_PATH !== undefined
+    ? process.env.NEXT_PUBLIC_BASE_PATH
+    : process.env.NODE_ENV === "production"
+      ? "/portfolio"
+      : "";
 
 const description =
   "Full Stack .NET Developer with 2+ years of experience building production-grade SaaS applications using ASP.NET Core, Angular, SQL Server, and Azure. Based in Ahmedabad, India.";
@@ -46,11 +66,11 @@ export const metadata: Metadata = {
   category: "technology",
   icons: {
     icon: [
-      { url: "/portfolio/favicon.png", sizes: "48x48", type: "image/png" },
-      { url: "/portfolio/icon.svg", type: "image/svg+xml" },
+      { url: `${basePath}/favicon.png`, sizes: "48x48", type: "image/png" },
+      { url: `${basePath}/icon.svg`, type: "image/svg+xml" },
     ],
     apple: [
-      { url: "/portfolio/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+      { url: `${basePath}/apple-touch-icon.png`, sizes: "180x180", type: "image/png" },
     ],
   },
   openGraph: {
@@ -217,8 +237,13 @@ export default function RootLayout({
   ];
 
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className={`dark ${inter.variable} ${jetbrainsMono.variable}`}>
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='light'){document.documentElement.classList.remove('dark')}else{document.documentElement.classList.add('dark')}}catch(e){}})()`,
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
