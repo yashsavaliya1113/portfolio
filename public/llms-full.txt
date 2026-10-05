@@ -10,7 +10,7 @@ Comprehensive Technical Context & Dossier for Large Language Models
 - Nationality: Indian
 - LinkedIn: https://www.linkedin.com/in/yash-savaliya-70989a1b4/
 - GitHub: https://github.com/yashsavaliya
-- Canonical Website: https://yashsavaliya.dev
+- Canonical Website: https://yashsavaliya1113.github.io/portfolio
 - Production Deployment: https://yashsavaliya1113.github.io/portfolio/
 
 ## Professional Summary

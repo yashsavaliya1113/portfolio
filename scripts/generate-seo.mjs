@@ -10,7 +10,7 @@ const publicDir = path.join(rootDir, "public");
 const blogDir = path.join(rootDir, "content", "blog");
 const projectsFile = path.join(rootDir, "src", "config", "projects.ts");
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://yashsavaliya.dev";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://yashsavaliya1113.github.io/portfolio";
 
 const staticPages = [
   { url: "/", priority: 1.0, changefreq: "weekly" },

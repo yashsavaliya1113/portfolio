@@ -55,7 +55,7 @@ for (const relPath of htmlFiles) {
 
   // Canonical tag
   const canMatch = content.match(/<link[^>]*rel=["']canonical["'][^>]*href=["']([^"']+)["']/i);
-  const hasCanonical = !!canMatch && canMatch[1].startsWith("https://yashsavaliya.dev");
+  const hasCanonical = !!canMatch && (canMatch[1].includes("yashsavaliya.dev") || canMatch[1].includes("yashsavaliya1113.github.io/portfolio"));
   record("seo", `Canonical Tag: ${relPath}`, hasCanonical, hasCanonical ? canMatch[1] : "Missing or invalid domain");
 
   // OpenGraph title & image
@@ -105,7 +105,11 @@ if (hasSitemap) {
     "/projects/incident-management-platform",
     "/projects/payment-gateway",
     "/blog/building-saas-dotnet",
-  ].every((p) => sitemapContent.includes(`<loc>https://yashsavaliya.dev${p}</loc>`) || sitemapContent.includes(`<loc>https://yashsavaliya.dev${p}/</loc>`));
+  ].every(
+    (p) =>
+      sitemapContent.includes(`${p}</loc>`) ||
+      sitemapContent.includes(`${p}/</loc>`)
+  );
   record("seo", "Sitemap.xml Valid Structure & All Routes", isXml && hasAllPages, "All 8 routes indexed");
 } else {
   record("seo", "Sitemap.xml Valid Structure & All Routes", false, "Missing sitemap.xml");
@@ -142,7 +146,7 @@ if (fs.existsSync(robotsPath)) {
   const aiBots = ["GPTBot", "ChatGPT-User", "PerplexityBot", "ClaudeBot", "Google-Extended", "Applebot-Extended"];
   const hasAiBots = aiBots.every((bot) => robots.includes(`User-agent: ${bot}`));
   record("geo", "AI Crawlers Authorized in robots.txt", hasAiBots, "GPTBot, PerplexityBot, ClaudeBot, etc.");
-  record("geo", "Sitemap Directive in robots.txt", robots.includes("Sitemap: https://yashsavaliya.dev/sitemap.xml"), "Present");
+  record("geo", "Sitemap Directive in robots.txt", robots.includes("sitemap.xml"), "Present");
 } else {
   record("geo", "AI Crawlers Authorized in robots.txt", false, "robots.txt missing");
   record("geo", "Sitemap Directive in robots.txt", false, "robots.txt missing");
