@@ -9,7 +9,7 @@
 - **Email**: tpyashsavaliya13092002@gmail.com
 - **LinkedIn**: https://www.linkedin.com/in/yash-savaliya-70989a1b4/
 - **GitHub**: https://github.com/yashsavaliya
-- **Canonical Website**: https://yashsavaliya.dev
+- **Canonical Website**: https://yashsavaliya1113.github.io/portfolio
 - **Live Deployment**: https://yashsavaliya1113.github.io/portfolio/
 
 ## Key Technical Competencies
@@ -22,9 +22,9 @@
 - **Agentic AI**: Semantic Kernel, Azure OpenAI, LangGraph, CrewAI, Retrieval-Augmented Generation (RAG)
 
 ## Key Projects
-- [White-Label Assessment Platform](https://yashsavaliya.dev/projects/white-label-assessment-platform): Distributed multi-tenant assessment SaaS platform with .NET 10 Clean Architecture microservices, GraphQL APIs via HotChocolate, and Angular 22 micro-frontends via Module Federation.
-- [Incident Management Platform](https://yashsavaliya.dev/projects/incident-management-platform): White-label SaaS status page and incident response system reducing incident resolution time from 30+ minutes to under 5 minutes.
-- [FinTech Payment Gateway](https://yashsavaliya.dev/projects/payment-gateway): High-throughput payment processing SaaS built on .NET 10 Aspire, Blazor, Redis distributed caching, and RabbitMQ event streaming.
+- [White-Label Assessment Platform](https://yashsavaliya1113.github.io/portfolio/projects/white-label-assessment-platform): Distributed multi-tenant assessment SaaS platform with .NET 10 Clean Architecture microservices, GraphQL APIs via HotChocolate, and Angular 22 micro-frontends via Module Federation.
+- [Incident Management Platform](https://yashsavaliya1113.github.io/portfolio/projects/incident-management-platform): White-label SaaS status page and incident response system reducing incident resolution time from 30+ minutes to under 5 minutes.
+- [FinTech Payment Gateway](https://yashsavaliya1113.github.io/portfolio/projects/payment-gateway): High-throughput payment processing SaaS built on .NET 10 Aspire, Blazor, Redis distributed caching, and RabbitMQ event streaming.
 
 ## Experience
 - **iTechOps — Full Stack Developer** (Nov 2024 – Present, Ahmedabad, India)
@@ -39,7 +39,7 @@
   - CGPA: 7.49 / 10.0
 
 ## Full Technical Documentation
-- [Comprehensive AI Context (llms-full.txt)](https://yashsavaliya.dev/llms-full.txt): Detailed breakdown of architecture, code structures, and projects for LLM ingest.
-- [Blog](https://yashsavaliya.dev/blog): In-depth articles on .NET architecture, SaaS engineering, and AI workflows.
-- [AI Lab](https://yashsavaliya.dev/ai-lab): Explorations in autonomous agents, RAG, and Semantic Kernel.
-- [Resume](https://yashsavaliya.dev/resume): Interactive resume with direct PDF download.
+- [Comprehensive AI Context (llms-full.txt)](https://yashsavaliya1113.github.io/portfolio/llms-full.txt): Detailed breakdown of architecture, code structures, and projects for LLM ingest.
+- [Blog](https://yashsavaliya1113.github.io/portfolio/blog): In-depth articles on .NET architecture, SaaS engineering, and AI workflows.
+- [AI Lab](https://yashsavaliya1113.github.io/portfolio/ai-lab): Explorations in autonomous agents, RAG, and Semantic Kernel.
+- [Resume](https://yashsavaliya1113.github.io/portfolio/resume): Interactive resume with direct PDF download.

@@ -32,4 +32,4 @@ Allow: /
 User-agent: Bingbot
 Allow: /
 
-Sitemap: https://yashsavaliya.dev/sitemap.xml
+Sitemap: https://yashsavaliya1113.github.io/portfolio/sitemap.xml
