@@ -130,6 +130,8 @@ const filesToCopy = [
   "apple-touch-icon.png",
   "icon.svg",
   "avatar.webp",
+  "9f8e7d6c5b4a39281726354859607182.txt",
+  "google2f75ccea5a94c8d4.html",
 ];
 
 for (const file of filesToCopy) {

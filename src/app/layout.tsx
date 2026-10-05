@@ -130,6 +130,9 @@ export const metadata: Metadata = {
     "rating": "General",
     "revisit-after": "7 days",
   },
+  verification: {
+    google: "google2f75ccea5a94c8d4",
+  },
 };
 
 export default function RootLayout({
