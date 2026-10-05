@@ -27,7 +27,7 @@ const basePath =
       : "";
 
 const description =
-  "Full Stack .NET Developer with 2+ years of experience building production-grade SaaS applications using ASP.NET Core, Angular, SQL Server, and Azure. Based in Ahmedabad, India.";
+  "Data Analyst & Full Stack Developer with 2+ years of experience in data analytics, financial variance modeling, SQL, Excel advanced dashboards, and SaaS architecture. Based in Ahmedabad, India.";
 
 export const viewport: Viewport = {
   themeColor: "#09090b",
@@ -45,20 +45,20 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   keywords: [
     "Yash Savaliya",
-    ".NET Developer",
+    "Data Analyst",
+    "Data Analytics India",
+    "Business Intelligence",
+    "Excel Advanced Modeling",
     "Full Stack Developer",
+    ".NET Developer",
     "ASP.NET Core",
     "Angular Developer",
-    "C# Developer",
+    "SQL Server",
     "Azure",
     "SaaS Platform",
-    "Software Engineer India",
-    "Agentic AI",
-    "Semantic Kernel",
-    "iTechOps",
-    "Ahmedabad Developer",
+    "Ahmedabad Data Analyst",
     "Gujarat Software Engineer",
-    "Microservices Architect",
+    "Agentic AI",
   ],
   authors: [{ name: profile.name, url: siteConfig.url }],
   creator: profile.name,

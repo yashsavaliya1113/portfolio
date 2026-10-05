@@ -1,11 +1,12 @@
 "use client";
 
-import { Server, Globe, FolderTree, Cloud, Database, ShieldCheck, Bot } from "lucide-react";
+import { Server, Globe, FolderTree, Cloud, Database, ShieldCheck, Bot, BarChart3 } from "lucide-react";
 import { SectionHeading } from "@/components/SectionHeading";
 import { SkillBadge } from "@/components/SkillBadge";
 import { skillCategories } from "@/config/skills";
 
 const categoryIcons: Record<string, React.ReactNode> = {
+  "Data Analytics & BI": <BarChart3 size={16} />,
   Backend: <Server size={16} />,
   Frontend: <Globe size={16} />,
   Architecture: <FolderTree size={16} />,

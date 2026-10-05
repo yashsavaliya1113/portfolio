@@ -2,6 +2,67 @@ import type { Project } from "@/types";
 
 export const projects: Project[] = [
   {
+    slug: "ahmedabad-rera-data-analytics",
+    title: "Ahmedabad Real Estate (RERA) Market & Cost Variance Analytics",
+    description:
+      "Comprehensive data analytics dashboard examining 5,478 RERA real estate developments and ₹1.52 Lakh Crores in investment across Ahmedabad.",
+    fullDescription:
+      "An end-to-end data analytics project examining 5,478 registered RERA projects in Ahmedabad, Gujarat. Features an automated ETL cleaning pipeline, data quality audit metrics, project duration cohort distribution modeling (averaging 4.38 years), financial cost variance analysis across ₹1,52,163 Crores in capital investment, and dynamic multi-dimensional pivot tables with interactive slicers.",
+    image: "/projects/rera-analytics.png",
+    screenshots: [],
+    technologies: [
+      "Excel Advanced",
+      "Pivot Tables & Slicers",
+      "Data Cleaning & ETL",
+      "Financial Variance",
+      "Statistical Analysis",
+      "Data Quality Auditing",
+      "Data Modeling",
+    ],
+    categories: ["Data Analytics", "Real Estate", "Financial Modeling", "Business Intelligence"],
+    links: {
+      live: "https://1drv.ms/x/c/25793d4f2e5f6457/IQC4UkGBacoZS6MSIKyAF3TpASOqmXjhNGVW7N4TjO3zCtw?e=WAvp4D",
+      caseStudy: "/projects/ahmedabad-rera-data-analytics",
+    },
+    featured: true,
+    problem:
+      "Ahmedabad's real estate ecosystem encompasses thousands of active developments and billions of rupees in capital. Industry stakeholders, property buyers, and financial analysts lacked an auditable analytical framework to evaluate project completion timelines, developmental risks, and budget variances across regulatory filings.",
+    architecture:
+      "Constructed a 7-tier analytical data pipeline: (1) Raw RERA ingestion layer with 38 attributes, (2) Clean Data layer with formulaic date serialization and cost normalization, (3) Data Quality verification matrix, (4) Statistical Distribution models, (5) Cost & Budget Variance benchmarking, (6) Interactive Multi-Dimensional Pivot Tables, and (7) Visual Executive Dashboard.",
+    features: [
+      "Cleaned and validated 5,478 government RERA registration records across 38 structured attributes",
+      "Engineered timeline metrics: Project_Duration_Days, Project_Duration_Years, and duration cohorts (<1yr, 1-3yr, 3-5yr, 5-10yr, 10yr+)",
+      "Financial variance modeling comparing estimated vs. actual costs across ₹1,52,163 Crores in total project costs",
+      "Data Quality audit sheet verifying completeness, schema conformity, missing records, and anomaly detection",
+      "Multi-dimensional Pivot Tables with dynamic timeline (2007–2026) and project-type cross-tabulation",
+      "Segmented variance analysis across Residential (41.2%), Mixed Development (41.2%), Commercial (16.3%), and Plotted Land (1.3%)",
+    ],
+    databaseDesign:
+      "Normalized tabular data schema featuring numeric cost conversions (Project_Cost_Num), standardized date fields, and derived temporal dimensions.",
+    apiDesign:
+      "Structured Excel formula architecture utilizing date serialization, dynamic LOOKUP/INDEX-MATCH patterns, variance formulas, and automated aggregate summary tables.",
+    challenges: [
+      "Sanitizing non-standard date formats, textual currency notations, and missing attributes across historical government filings",
+      "Maintaining high-performance calculation and instant pivot slicer responsiveness across 5,400+ multi-column rows",
+    ],
+    lessonsLearned: [
+      "Rigorous data quality audits and ingestion-layer cleaning are the foundation of trustworthy business intelligence.",
+      "Clear metric engineering (like timeline cohorting) turns raw dates into immediately actionable risk indicators for decision-makers.",
+    ],
+    futureImprovements: [
+      "Automate continuous data extraction via Python web scrapers (Playwright/BeautifulSoup) with automated RERA portal updates",
+      "Deploy interactive Power BI and Streamlit dashboards with interactive geospatial mapping across Ahmedabad wards",
+    ],
+    timeline: "3 weeks",
+    metrics: [
+      { label: "Projects Analyzed", value: "5,478" },
+      { label: "Capital Investment", value: "₹1.52 Lakh Cr" },
+      { label: "Dominant Timeline", value: "3–5 Years (53.4%)" },
+      { label: "Net Cost Variance", value: "-0.36% (-₹553 Cr)" },
+    ],
+    status: "completed",
+  },
+  {
     slug: "white-label-assessment-platform",
     title: "White-Label Assessment Platform",
     description:

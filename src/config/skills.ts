@@ -2,6 +2,21 @@ import type { SkillCategory } from "@/types";
 
 export const skillCategories: SkillCategory[] = [
   {
+    title: "Data Analytics & BI",
+    skills: [
+      { name: "Excel Advanced (Formulas & Modeling)" },
+      { name: "Pivot Tables & Interactive Slicers" },
+      { name: "Data Cleaning & Sanitization (ETL)" },
+      { name: "Financial & Cost Variance Analysis" },
+      { name: "Exploratory Data Analysis (EDA)" },
+      { name: "Data Quality & Integrity Auditing" },
+      { name: "Statistical Modeling & Cohort Analysis" },
+      { name: "KPI Dashboarding & Visualization" },
+      { name: "SQL & Complex Aggregations" },
+      { name: "Python for Data (Pandas)" },
+    ],
+  },
+  {
     title: "Backend",
     skills: [
       { name: "C#" },

@@ -58,6 +58,17 @@ export function ProjectCard({ project, index }: Props) {
               Code
             </a>
           )}
+          {project.links.live && (
+            <a
+              href={project.links.live}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-xs text-[var(--color-muted)] transition-colors hover:text-primary"
+            >
+              <ArrowUpRight size={13} />
+              Excel Workbook
+            </a>
+          )}
           {project.links.caseStudy && (
             <Link
               href={project.links.caseStudy}

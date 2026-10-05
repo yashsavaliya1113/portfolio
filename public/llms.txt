@@ -13,6 +13,7 @@
 - **Live Deployment**: https://yashsavaliya1113.github.io/portfolio/
 
 ## Key Technical Competencies
+- **Data Analytics & BI**: Advanced Excel (Formulas, Pivot Tables, Slicers), Data Cleaning & ETL, Financial & Variance Analysis, Exploratory Data Analysis (EDA), Data Quality Auditing, Statistical Modeling, KPI Dashboards, SQL, Python (Pandas)
 - **Backend**: C#, ASP.NET Core (.NET 6/8/10), Entity Framework Core, LINQ, Web API, Minimal APIs, Blazor, .NET Aspire, GraphQL (HotChocolate)
 - **Architecture**: Clean Architecture, CQRS, MediatR, Microservices, Modular Monoliths, Event-Driven Architecture, Outbox Pattern, Multi-Tenancy
 - **Frontend**: Angular 14/22, Module Federation, TypeScript, RxJS, Tailwind CSS, Responsive Web Design
@@ -22,6 +23,7 @@
 - **Agentic AI**: Semantic Kernel, Azure OpenAI, LangGraph, CrewAI, Retrieval-Augmented Generation (RAG)
 
 ## Key Projects
+- [Ahmedabad RERA Real Estate Data Analytics](https://yashsavaliya1113.github.io/portfolio/projects/ahmedabad-rera-data-analytics): End-to-end data analytics dashboard analyzing 5,478 registered RERA developments and ₹1.52 Lakh Crores in investment across Ahmedabad. Features automated ETL data cleaning, duration distribution modeling, data quality auditing, and interactive pivot dashboards.
 - [White-Label Assessment Platform](https://yashsavaliya1113.github.io/portfolio/projects/white-label-assessment-platform): Distributed multi-tenant assessment SaaS platform with .NET 10 Clean Architecture microservices, GraphQL APIs via HotChocolate, and Angular 22 micro-frontends via Module Federation.
 - [Incident Management Platform](https://yashsavaliya1113.github.io/portfolio/projects/incident-management-platform): White-label SaaS status page and incident response system reducing incident resolution time from 30+ minutes to under 5 minutes.
 - [FinTech Payment Gateway](https://yashsavaliya1113.github.io/portfolio/projects/payment-gateway): High-throughput payment processing SaaS built on .NET 10 Aspire, Blazor, Redis distributed caching, and RabbitMQ event streaming.

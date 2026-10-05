@@ -28,6 +28,7 @@ const htmlFiles = [
   "ai-lab/index.html",
   "blog/index.html",
   "blog/building-saas-dotnet/index.html",
+  "projects/ahmedabad-rera-data-analytics/index.html",
   "projects/white-label-assessment-platform/index.html",
   "projects/incident-management-platform/index.html",
   "projects/payment-gateway/index.html",
@@ -101,6 +102,7 @@ if (hasSitemap) {
     "/blog",
     "/ai-lab",
     "/resume",
+    "/projects/ahmedabad-rera-data-analytics",
     "/projects/white-label-assessment-platform",
     "/projects/incident-management-platform",
     "/projects/payment-gateway",
@@ -110,7 +112,7 @@ if (hasSitemap) {
       sitemapContent.includes(`${p}</loc>`) ||
       sitemapContent.includes(`${p}/</loc>`)
   );
-  record("seo", "Sitemap.xml Valid Structure & All Routes", isXml && hasAllPages, "All 8 routes indexed");
+  record("seo", "Sitemap.xml Valid Structure & All Routes", isXml && hasAllPages, "All 9 routes indexed");
 } else {
   record("seo", "Sitemap.xml Valid Structure & All Routes", false, "Missing sitemap.xml");
 }
