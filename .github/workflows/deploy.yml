@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main, perf-seo-geo-optimization]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -31,6 +31,8 @@ jobs:
         run: npm run build
         env:
           NEXT_PUBLIC_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+      - name: Verify SEO, GEO, and Performance (100% Score)
+        run: npm run audit
       - name: Upload Artifacts
         uses: actions/upload-pages-artifact@v3
         with:
@@ -43,6 +45,12 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Notify Search Engines & AI Crawlers (IndexNow)
+        run: node scripts/ping-search-engines.mjs
