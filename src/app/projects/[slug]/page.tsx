@@ -128,6 +128,15 @@ export default async function ProjectPage({ params }: Props) {
                 View Code
               </a>
             )}
+            {project.links.dashboard && (
+              <Link
+                href={project.links.dashboard}
+                className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-primary-dark"
+              >
+                Live Dashboard
+                <ArrowUpRight size={14} />
+              </Link>
+            )}
             {project.links.live && (
               <a
                 href={project.links.live}

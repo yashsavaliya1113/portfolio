@@ -17,6 +17,13 @@ Comprehensive Technical Context & Dossier for Large Language Models
 Full Stack .NET Developer with 2+ years of hands-on production experience architecting, building, and operating multi-tenant SaaS platforms, enterprise REST and GraphQL APIs, and scalable distributed services. Highly proficient in C#, ASP.NET Core (.NET 6/8/10), Entity Framework Core, SQL Server, Redis, RabbitMQ, and Angular. Possesses extensive experience implementing enterprise software architecture patterns including Clean Architecture, CQRS with MediatR, Domain-Driven Design (DDD), Outbox Pattern, and Modular Monoliths. Actively engineering Agentic AI solutions leveraging Semantic Kernel, Azure OpenAI, LangGraph, and RAG pipelines.
 
 ## Core Technical Skills
+### Data Analytics & Business Intelligence
+- Analytics Tools: Advanced Excel (Nested Formulas, Array Functions, Dynamic Named Ranges, Multi-Dimensional Pivot Tables, Interactive Slicers), Power BI / Tableau fundamentals
+- Data Engineering & ETL: Data Cleaning pipelines, schema harmonization, date serialization, numeric cost normalization, outlier detection
+- Quality & Auditing: Automated Data Quality scoring, field completeness tracking, missing record diagnostics, duplicate suppression
+- Quantitative Modeling: Exploratory Data Analysis (EDA), Timeline Duration cohorting, Financial & Cost Variance benchmarking, aggregate distributions
+- Languages: SQL (complex aggregations, window functions, CTEs), Python (Pandas, NumPy fundamentals)
+
 ### Backend & Core Runtime
 - Languages: C# (.NET 6, .NET 8, .NET 10 preview), TypeScript, SQL, Python
 - Frameworks: ASP.NET Core, ASP.NET Web API, ASP.NET MVC, Minimal APIs, Blazor (Server & WebAssembly), .NET Aspire
@@ -68,7 +75,18 @@ Full Stack .NET Developer with 2+ years of hands-on production experience archit
 - Implemented automated integration and unit test suites with xUnit, Moq, and FluentAssertions, increasing code coverage to >80%.
 
 ## Production Projects Detailed
-### 1. White-Label Assessment Platform
+### 1. Ahmedabad Real Estate (RERA) Market & Cost Variance Analytics
+- Domain: Real Estate Economics, Urban Analytics & Regulatory Compliance
+- Live Workbook: https://1drv.ms/x/c/25793d4f2e5f6457/IQC4UkGBacoZS6MSIKyAF3TpASOqmXjhNGVW7N4TjO3zCtw?e=WAvp4D
+- Scope: 5,478 registered RERA projects across Ahmedabad, Gujarat | ₹2,56,864 Crores in total project costs (~$18B+ USD)
+- Analytics Architecture:
+  - 7-Sheet Architecture: Raw_data (38 attributes), Clean_Data (ETL sanitized), Data_Quality (audit tracking), Analysis (summary statistics), Cost_Analysis (variance modeling), Pivot_analysis (interactive slicers), Charts (executive visual dashboard).
+  - Quantitative Insights:
+    - 41.22% Residential (2,258 projects), 41.20% Mixed Development (2,257 projects), 16.28% Commercial (892 projects), 1.30% Plotted Land (71 projects).
+    - Timeline Duration: Average duration of 4.38 years (1,598 days); median of 4.25 years (1,550 days). 53.2% of projects fall in the 3-to-5-year completion window.
+    - Financial Variance: Total cost difference of -₹553.25 Crores (-0.36% overall net variance). Commercial developments showed +2.38% cost expansion (+₹61.56 Cr), while mixed developments delivered -1.06% savings (-₹714.50 Cr).
+
+### 2. White-Label Assessment Platform
 - Domain: EdTech & Enterprise Assessment SaaS
 - Stack: .NET 10, GraphQL (HotChocolate), Clean Architecture, Microservices, Angular 22, Module Federation, JWT, Azure SQL
 - Architecture Highlights:

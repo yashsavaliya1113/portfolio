@@ -45,7 +45,7 @@ export interface Project {
   screenshots: string[];
   technologies: string[];
   categories: string[];
-  links: { github?: string; live?: string; caseStudy?: string };
+  links: { github?: string; live?: string; caseStudy?: string; dashboard?: string };
   featured: boolean;
   problem: string;
   architecture: string;
