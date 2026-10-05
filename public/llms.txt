@@ -37,3 +37,9 @@
 - **Bachelor of Technology (B.Tech) in Information Technology**
   - RK University, Rajkot, Gujarat, India (2020 – 2024)
   - CGPA: 7.49 / 10.0
+
+## Full Technical Documentation
+- [Comprehensive AI Context (llms-full.txt)](https://yashsavaliya.dev/llms-full.txt): Detailed breakdown of architecture, code structures, and projects for LLM ingest.
+- [Blog](https://yashsavaliya.dev/blog): In-depth articles on .NET architecture, SaaS engineering, and AI workflows.
+- [AI Lab](https://yashsavaliya.dev/ai-lab): Explorations in autonomous agents, RAG, and Semantic Kernel.
+- [Resume](https://yashsavaliya.dev/resume): Interactive resume with direct PDF download.

@@ -3,7 +3,9 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const outDir = path.join(__dirname, "..", "out");
+const rootDir = path.join(__dirname, "..");
+const outDir = path.join(rootDir, "out");
+const publicDir = path.join(rootDir, "public");
 
 const siteUrl = "https://yashsavaliya.dev";
 
@@ -11,10 +13,11 @@ const staticPages = [
   { url: "/", priority: 1.0, changefreq: "weekly" },
   { url: "/blog", priority: 0.9, changefreq: "weekly" },
   { url: "/ai-lab", priority: 0.8, changefreq: "weekly" },
-  { url: "/resume", priority: 0.6, changefreq: "monthly" },
+  { url: "/resume", priority: 0.7, changefreq: "monthly" },
 ];
 
 const projects = [
+  { slug: "white-label-assessment-platform" },
   { slug: "incident-management-platform" },
   { slug: "payment-gateway" },
 ];
@@ -36,6 +39,7 @@ const urls = [
   })),
 ];
 
+// Generate sitemap.xml
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls
@@ -50,9 +54,14 @@ ${urls
   .join("\n")}
 </urlset>`;
 
+if (!fs.existsSync(outDir)) {
+  fs.mkdirSync(outDir, { recursive: true });
+}
+
 fs.writeFileSync(path.join(outDir, "sitemap.xml"), sitemap);
 console.log("✓ Generated sitemap.xml");
 
+// Generate rss.xml
 const rssItems = blogPosts
   .map(
     (post) => `    <item>
@@ -81,3 +90,25 @@ ${rssItems}
 
 fs.writeFileSync(path.join(outDir, "rss.xml"), rss);
 console.log("✓ Generated rss.xml");
+
+// Copy public SEO/GEO files to out/
+const filesToCopy = [
+  "robots.txt",
+  "llms.txt",
+  "llms-full.txt",
+  "llm.txt",
+  "favicon.png",
+  "favicon-32x32.png",
+  "apple-touch-icon.png",
+  "icon.svg",
+  "avatar.webp",
+];
+
+for (const file of filesToCopy) {
+  const src = path.join(publicDir, file);
+  const dest = path.join(outDir, file);
+  if (fs.existsSync(src)) {
+    fs.copyFileSync(src, dest);
+    console.log(`✓ Copied ${file} to out/`);
+  }
+}

@@ -4,7 +4,7 @@ export const siteConfig: SiteConfig = {
   name: "Yash Savaliya",
   description:
     "Full Stack .NET Developer building production-grade SaaS applications with ASP.NET Core, Angular, and Azure.",
-  url: "https://yashsavaliya.dev",
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://yashsavaliya.dev",
   ogImage: "/og.png",
   links: {
     github: "https://github.com/yashsavaliya",

@@ -23,11 +23,20 @@ export function AboutSection() {
           <div className="lg:col-span-3">
             <div className="mb-8 flex items-center gap-6 animate-fade-up" style={{ animationFillMode: "both" }}>
               <div className="h-20 w-20 shrink-0 overflow-hidden rounded-2xl border border-[var(--color-border)]">
-                <img
-                  src={profile.avatar}
-                  alt={`${profile.name} portrait`}
-                  className="h-full w-full object-cover"
-                />
+                <picture>
+                  {profile.avatarWebp && (
+                    <source srcSet={profile.avatarWebp} type="image/webp" />
+                  )}
+                  <img
+                    src={profile.avatar}
+                    alt={`${profile.name} portrait`}
+                    width={80}
+                    height={80}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-full w-full object-cover"
+                  />
+                </picture>
               </div>
               <div>
                 <h3 className="font-heading text-xl font-semibold">{profile.name}</h3>

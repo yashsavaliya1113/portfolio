@@ -1,5 +1,4 @@
-"use client";
-
+import type { Metadata } from "next";
 import { FileDown, GraduationCap } from "lucide-react";
 import { profile } from "@/config/profile";
 import { experiences } from "@/config/experience";
@@ -7,9 +6,72 @@ import { skillCategories } from "@/config/skills";
 import { siteConfig } from "@/config/site";
 import { education } from "@/config/education";
 
+export const metadata: Metadata = {
+  title: "Resume",
+  description: `Professional Resume of ${profile.name} — ${profile.title}. Experience in ASP.NET Core, Angular, Microservices, Azure, and Agentic AI.`,
+  openGraph: {
+    title: `Resume — ${profile.name}`,
+    description: `Professional Resume of ${profile.name} — ${profile.title}. Experience in ASP.NET Core, Angular, Microservices, Azure, and Agentic AI.`,
+    url: `${siteConfig.url}/resume`,
+    images: [
+      {
+        url: `${siteConfig.url}/og.png`,
+        width: 1200,
+        height: 630,
+        alt: `Resume — ${profile.name}`,
+      },
+    ],
+  },
+  twitter: {
+    title: `Resume — ${profile.name}`,
+    description: `Professional Resume of ${profile.name} — ${profile.title}. Experience in ASP.NET Core, Angular, Microservices, Azure, and Agentic AI.`,
+  },
+  alternates: {
+    canonical: `${siteConfig.url}/resume`,
+  },
+  keywords: [
+    "Yash Savaliya resume",
+    ".NET Developer CV",
+    "Full Stack .NET resume",
+    "ASP.NET Core developer resume",
+    "Angular developer India",
+    "Ahmedabad software engineer",
+  ],
+};
+
 export default function ResumePage() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    name: `Resume — ${profile.name}`,
+    description: profile.about,
+    url: `${siteConfig.url}/resume`,
+    mainEntity: {
+      "@type": "Person",
+      name: profile.name,
+      jobTitle: profile.title,
+      description: profile.about,
+      email: siteConfig.links.email,
+      telephone: "+918104017448",
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Ahmedabad",
+        addressRegion: "Gujarat",
+        addressCountry: "IN",
+      },
+      alumniOf: {
+        "@type": "CollegeOrUniversity",
+        name: "RK University",
+      },
+    },
+  };
+
   return (
     <div className="pt-24 pb-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
         <div className="flex items-center justify-between mb-8 animate-fade-up" style={{ animationFillMode: "both" }}>
           <h1 className="font-heading text-3xl font-bold tracking-tight">Resume</h1>
@@ -27,7 +89,7 @@ export default function ResumePage() {
         <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 animate-fade-up" style={{ animationDelay: "0.1s", animationFillMode: "both" }}>
           <div className="border-b border-[var(--color-border)] pb-6">
             <h2 className="font-heading text-2xl font-bold">{profile.name}</h2>
-            <p className="text-primary">{profile.title}</p>
+            <p className="text-primary font-medium">{profile.title}</p>
             <div className="mt-2 flex flex-wrap gap-4 text-sm text-[var(--color-muted)]">
               <a href={`mailto:${siteConfig.links.email}`} className="hover:text-[var(--color-text)]">
                 {siteConfig.links.email}
@@ -39,24 +101,24 @@ export default function ResumePage() {
                 LinkedIn
               </a>
               <span>{profile.location}</span>
-              <span>+91-8104017448</span>
+              <span>+91-81040 17448</span>
             </div>
           </div>
 
           <div className="py-6 border-b border-[var(--color-border)]">
-            <h3 className="mb-3 text-sm font-medium text-primary uppercase tracking-wider">Summary</h3>
+            <h3 className="mb-3 text-sm font-semibold text-primary uppercase tracking-wider">Summary</h3>
             <p className="text-sm text-[var(--color-muted)] leading-relaxed">{profile.about}</p>
           </div>
 
           <div className="py-6 border-b border-[var(--color-border)]">
-            <h3 className="mb-4 text-sm font-medium text-primary uppercase tracking-wider">Experience</h3>
+            <h3 className="mb-4 text-sm font-semibold text-primary uppercase tracking-wider">Experience</h3>
             <div className="space-y-6">
               {experiences.map((exp) => (
                 <div key={exp.company}>
                   <div className="flex items-start justify-between">
                     <div>
                       <h4 className="font-heading font-semibold">{exp.role}</h4>
-                      <p className="text-sm text-primary">{exp.company}</p>
+                      <p className="text-sm text-primary font-medium">{exp.company}</p>
                     </div>
                     <span className="text-xs text-[var(--color-muted)]">{exp.period}</span>
                   </div>
@@ -70,7 +132,7 @@ export default function ResumePage() {
                   </ul>
                   <div className="mt-2 flex flex-wrap gap-1">
                     {exp.technologies.map((t) => (
-                      <span key={t} className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] text-primary">{t}</span>
+                      <span key={t} className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary dark:text-blue-400">{t}</span>
                     ))}
                   </div>
                 </div>
@@ -79,14 +141,14 @@ export default function ResumePage() {
           </div>
 
           <div className="py-6 border-b border-[var(--color-border)]">
-            <h3 className="mb-4 flex items-center gap-2 text-sm font-medium text-primary uppercase tracking-wider">
+            <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-primary uppercase tracking-wider">
               <GraduationCap size={14} />
               Education
             </h3>
             {education.map((edu) => (
               <div key={edu.degree}>
                 <h4 className="font-heading font-semibold">{edu.degree}</h4>
-                <p className="text-sm text-primary">{edu.field}</p>
+                <p className="text-sm text-primary font-medium">{edu.field}</p>
                 <p className="text-xs text-[var(--color-muted)]">
                   {edu.institution}, {edu.location} — {edu.period}
                 </p>
@@ -96,7 +158,7 @@ export default function ResumePage() {
           </div>
 
           <div className="py-6">
-            <h3 className="mb-4 text-sm font-medium text-primary uppercase tracking-wider">Skills</h3>
+            <h3 className="mb-4 text-sm font-semibold text-primary uppercase tracking-wider">Skills</h3>
             <div className="space-y-3">
               {skillCategories.map((cat) => (
                 <div key={cat.title}>

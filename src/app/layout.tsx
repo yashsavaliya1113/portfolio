@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ToastProvider } from "@/components/Toaster";
@@ -6,7 +6,15 @@ import { siteConfig } from "@/config/site";
 import { profile } from "@/config/profile";
 import "@/styles/globals.css";
 
-const description = `Full Stack .NET Developer with 2+ years of experience building production-grade SaaS applications using ASP.NET Core, Angular, SQL Server, and Azure. Based in Ahmedabad, India.`;
+const description =
+  "Full Stack .NET Developer with 2+ years of experience building production-grade SaaS applications using ASP.NET Core, Angular, SQL Server, and Azure. Based in Ahmedabad, India.";
+
+export const viewport: Viewport = {
+  themeColor: "#09090b",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
 
 export const metadata: Metadata = {
   title: {
@@ -29,11 +37,22 @@ export const metadata: Metadata = {
     "Semantic Kernel",
     "iTechOps",
     "Ahmedabad Developer",
+    "Gujarat Software Engineer",
+    "Microservices Architect",
   ],
   authors: [{ name: profile.name, url: siteConfig.url }],
   creator: profile.name,
   publisher: profile.name,
   category: "technology",
+  icons: {
+    icon: [
+      { url: "/portfolio/favicon.png", sizes: "48x48", type: "image/png" },
+      { url: "/portfolio/icon.svg", type: "image/svg+xml" },
+    ],
+    apple: [
+      { url: "/portfolio/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -43,10 +62,10 @@ export const metadata: Metadata = {
     siteName: profile.name,
     images: [
       {
-        url: siteConfig.ogImage,
+        url: `${siteConfig.url}/og.png`,
         width: 1200,
         height: 630,
-        alt: profile.name,
+        alt: `${profile.name} — Full Stack .NET Developer`,
       },
     ],
     countryName: "India",
@@ -55,7 +74,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: `${profile.name} — ${profile.title}`,
     description,
-    images: [siteConfig.ogImage],
+    images: [`${siteConfig.url}/og.png`],
   },
   robots: {
     index: true,
@@ -74,11 +93,6 @@ export const metadata: Metadata = {
       "application/rss+xml": `${siteConfig.url}/rss.xml`,
     },
   },
-  verification: {
-    google: "",
-    yandex: "",
-    yahoo: "",
-  },
   appleWebApp: {
     title: profile.name,
     statusBarStyle: "black-translucent",
@@ -89,7 +103,12 @@ export const metadata: Metadata = {
     address: true,
   },
   other: {
-    "google-site-verification": "",
+    "geo.region": "IN-GJ",
+    "geo.placename": "Ahmedabad, Gujarat, India",
+    "geo.position": "23.0225;72.5714",
+    "ICBM": "23.0225, 72.5714",
+    "rating": "General",
+    "revisit-after": "7 days",
   },
 };
 
@@ -101,73 +120,76 @@ export default function RootLayout({
   const jsonLd = [
     {
       "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: siteConfig.url },
-        { "@type": "ListItem", position: 2, name: "Blog", item: `${siteConfig.url}/blog` },
-        { "@type": "ListItem", position: 3, name: "Projects", item: `${siteConfig.url}/#projects` },
-        { "@type": "ListItem", position: 4, name: "AI Lab", item: `${siteConfig.url}/ai-lab` },
-        { "@type": "ListItem", position: 5, name: "Resume", item: `${siteConfig.url}/resume` },
-      ],
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "WebPage",
-      name: profile.name,
-      description: profile.about,
+      "@type": "ProfilePage",
+      name: `${profile.name} — Portfolio`,
       url: siteConfig.url,
-      about: {
+      description,
+      mainEntity: {
         "@type": "Person",
         name: profile.name,
-      },
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "Person",
-      name: profile.name,
-      givenName: "Yash",
-      familyName: "Savaliya",
-      jobTitle: profile.title,
-      description: profile.about,
-      url: siteConfig.url,
-      email: siteConfig.links.email,
-      telephone: "+918104017448",
-      address: {
-        "@type": "PostalAddress",
-        addressLocality: "Ahmedabad",
-        addressRegion: "Gujarat",
-        addressCountry: "IN",
-      },
-      nationality: "Indian",
-      sameAs: [
-        siteConfig.links.github,
-        siteConfig.links.linkedin,
-        `mailto:${siteConfig.links.email}`,
-      ],
-      knowsAbout: [
-        "C#",
-        "ASP.NET Core",
-        ".NET",
-        "Angular",
-        "Blazor",
-        "Azure",
-        "SQL Server",
-        "Redis",
-        "RabbitMQ",
-        "Keycloak",
-        "Semantic Kernel",
-        "Clean Architecture",
-        "CQRS",
-        "Microservices",
-      ],
-      alumniOf: {
-        "@type": "CollegeOrUniversity",
-        name: "RK University",
-        location: "Rajkot, Gujarat, India",
-      },
-      workLocation: {
-        "@type": "City",
-        name: "Ahmedabad",
+        givenName: "Yash",
+        familyName: "Savaliya",
+        jobTitle: profile.title,
+        description: profile.about,
+        url: siteConfig.url,
+        email: siteConfig.links.email,
+        telephone: "+918104017448",
+        hasOccupation: {
+          "@type": "Occupation",
+          name: "Full Stack .NET Developer",
+          occupationalCategory: "15-1252.00",
+          skills:
+            "ASP.NET Core, C#, Angular, Azure, Microservices, CQRS, Semantic Kernel, Agentic AI",
+        },
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: "Ahmedabad",
+          addressRegion: "Gujarat",
+          addressCountry: "IN",
+        },
+        geo: {
+          "@type": "GeoCoordinates",
+          latitude: 23.0225,
+          longitude: 72.5714,
+        },
+        nationality: "Indian",
+        sameAs: [
+          siteConfig.links.github,
+          siteConfig.links.linkedin,
+          `mailto:${siteConfig.links.email}`,
+        ],
+        knowsAbout: [
+          "C#",
+          "ASP.NET Core",
+          ".NET 8 / 10",
+          "Angular",
+          "Blazor",
+          "Azure",
+          "SQL Server",
+          "Redis",
+          "RabbitMQ",
+          "Keycloak",
+          "Semantic Kernel",
+          "Clean Architecture",
+          "CQRS",
+          "Microservices",
+          "GraphQL",
+          "Docker",
+          "Agentic AI",
+        ],
+        alumniOf: {
+          "@type": "CollegeOrUniversity",
+          name: "RK University",
+          location: "Rajkot, Gujarat, India",
+        },
+        worksFor: {
+          "@type": "Organization",
+          name: "iTechOps",
+        },
+        workLocation: {
+          "@type": "City",
+          name: "Ahmedabad",
+        },
       },
     },
     {
@@ -176,10 +198,21 @@ export default function RootLayout({
       name: profile.name,
       url: siteConfig.url,
       description,
-      about: {
+      author: {
         "@type": "Person",
         name: profile.name,
       },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: siteConfig.url },
+        { "@type": "ListItem", position: 2, name: "Blog", item: `${siteConfig.url}/blog` },
+        { "@type": "ListItem", position: 3, name: "Projects", item: `${siteConfig.url}/#projects` },
+        { "@type": "ListItem", position: 4, name: "AI Lab", item: `${siteConfig.url}/ai-lab` },
+        { "@type": "ListItem", position: 5, name: "Resume", item: `${siteConfig.url}/resume` },
+      ],
     },
   ];
 
@@ -191,15 +224,19 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <link rel="canonical" href={siteConfig.url} />
-        <meta name="theme-color" content="#09090b" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
         <link rel="me" href={siteConfig.links.github} />
         <link rel="me" href={siteConfig.links.linkedin} />
       </head>
       <body className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] antialiased">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-white focus:outline-none"
+        >
+          Skip to main content
+        </a>
         <ToastProvider>
           <Navbar />
-          <main>{children}</main>
+          <main id="main-content">{children}</main>
           <Footer />
         </ToastProvider>
       </body>
