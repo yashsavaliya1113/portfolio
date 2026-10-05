@@ -6,7 +6,7 @@ export const siteConfig: SiteConfig = {
     "Full Stack .NET Developer building production-grade SaaS applications with ASP.NET Core, Angular, and Azure.",
   url: process.env.NEXT_PUBLIC_SITE_URL || "https://yashsavaliya1113.github.io/portfolio",
   ogImage: "/og.png",
-  googleAnalyticsId: process.env.NEXT_PUBLIC_GA_ID || "",
+  googleAnalyticsId: process.env.NEXT_PUBLIC_GA_ID || "G-VDMNZ89EFG",
   links: {
     github: "https://github.com/yashsavaliya",
     linkedin: "https://www.linkedin.com/in/yash-savaliya-70989a1b4/",
