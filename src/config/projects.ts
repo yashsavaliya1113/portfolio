@@ -5,9 +5,9 @@ export const projects: Project[] = [
     slug: "ahmedabad-rera-data-analytics",
     title: "Ahmedabad Real Estate (RERA) Market & Cost Variance Analytics",
     description:
-      "Comprehensive data analytics dashboard examining 5,478 RERA real estate developments and ₹1.52 Lakh Crores in investment across Ahmedabad.",
+      "Comprehensive data analytics dashboard examining 5,478 RERA real estate developments and ₹2.57 Lakh Crores in investment across Ahmedabad.",
     fullDescription:
-      "An end-to-end data analytics project examining 5,478 registered RERA projects in Ahmedabad, Gujarat. Features an automated ETL cleaning pipeline, data quality audit metrics, project duration cohort distribution modeling (averaging 4.38 years), financial cost variance analysis across ₹1,52,163 Crores in capital investment, and dynamic multi-dimensional pivot tables with interactive slicers.",
+      "An end-to-end data analytics project examining 5,478 registered RERA projects in Ahmedabad, Gujarat. Features a live in-browser ETL pipeline (raw GujRERA CSV → cleaned metrics → charts), data quality audit metrics, project duration cohort distribution modeling (averaging 4.38 years), financial cost variance analysis across ₹2,56,864 Crores in capital investment, and dynamic multi-dimensional pivot tables with interactive slicers.",
     image: "/projects/rera-analytics.png",
     screenshots: [],
     technologies: [
@@ -23,6 +23,7 @@ export const projects: Project[] = [
     links: {
       live: "https://1drv.ms/x/c/25793d4f2e5f6457/IQC4UkGBacoZS6MSIKyAF3TpASOqmXjhNGVW7N4TjO3zCtw?e=WAvp4D",
       caseStudy: "/projects/ahmedabad-rera-data-analytics",
+      dashboard: "/rera-analytics",
     },
     featured: true,
     problem:
@@ -32,10 +33,10 @@ export const projects: Project[] = [
     features: [
       "Cleaned and validated 5,478 government RERA registration records across 38 structured attributes",
       "Engineered timeline metrics: Project_Duration_Days, Project_Duration_Years, and duration cohorts (<1yr, 1-3yr, 3-5yr, 5-10yr, 10yr+)",
-      "Financial variance modeling comparing estimated vs. actual costs across ₹1,52,163 Crores in total project costs",
+      "Financial variance modeling comparing estimated vs. actual costs across ₹2,56,864 Crores in total project costs",
       "Data Quality audit sheet verifying completeness, schema conformity, missing records, and anomaly detection",
       "Multi-dimensional Pivot Tables with dynamic timeline (2007–2026) and project-type cross-tabulation",
-      "Segmented variance analysis across Residential (41.2%), Mixed Development (41.2%), Commercial (16.3%), and Plotted Land (1.3%)",
+      "Segmented variance analysis across Residential (41.2%), Mixed Development (41.2%), Commercial (16.3%), and Plotted Development (1.3%)",
     ],
     databaseDesign:
       "Normalized tabular data schema featuring numeric cost conversions (Project_Cost_Num), standardized date fields, and derived temporal dimensions.",
@@ -56,8 +57,8 @@ export const projects: Project[] = [
     timeline: "3 weeks",
     metrics: [
       { label: "Projects Analyzed", value: "5,478" },
-      { label: "Capital Investment", value: "₹1.52 Lakh Cr" },
-      { label: "Dominant Timeline", value: "3–5 Years (53.4%)" },
+      { label: "Capital Investment", value: "₹2.57 Lakh Cr" },
+      { label: "Dominant Timeline", value: "3–5 Years (53.2%)" },
       { label: "Net Cost Variance", value: "-0.36% (-₹553 Cr)" },
     ],
     status: "completed",

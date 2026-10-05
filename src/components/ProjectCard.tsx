@@ -69,6 +69,15 @@ export function ProjectCard({ project, index }: Props) {
               Excel Workbook
             </a>
           )}
+          {project.links.dashboard && (
+            <Link
+              href={project.links.dashboard}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-primary-dark"
+            >
+              Live Dashboard
+              <ArrowUpRight size={13} />
+            </Link>
+          )}
           {project.links.caseStudy && (
             <Link
               href={project.links.caseStudy}

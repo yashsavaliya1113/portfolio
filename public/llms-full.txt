@@ -78,12 +78,12 @@ Full Stack .NET Developer with 2+ years of hands-on production experience archit
 ### 1. Ahmedabad Real Estate (RERA) Market & Cost Variance Analytics
 - Domain: Real Estate Economics, Urban Analytics & Regulatory Compliance
 - Live Workbook: https://1drv.ms/x/c/25793d4f2e5f6457/IQC4UkGBacoZS6MSIKyAF3TpASOqmXjhNGVW7N4TjO3zCtw?e=WAvp4D
-- Scope: 5,478 registered RERA projects across Ahmedabad, Gujarat | ₹1,52,163 Crores in total project costs (~$18B+ USD)
+- Scope: 5,478 registered RERA projects across Ahmedabad, Gujarat | ₹2,56,864 Crores in total project costs (~$18B+ USD)
 - Analytics Architecture:
   - 7-Sheet Architecture: Raw_data (38 attributes), Clean_Data (ETL sanitized), Data_Quality (audit tracking), Analysis (summary statistics), Cost_Analysis (variance modeling), Pivot_analysis (interactive slicers), Charts (executive visual dashboard).
   - Quantitative Insights:
     - 41.22% Residential (2,258 projects), 41.20% Mixed Development (2,257 projects), 16.28% Commercial (892 projects), 1.30% Plotted Land (71 projects).
-    - Timeline Duration: Average duration of 4.38 years (1,598 days); median of 4.25 years (1,550 days). 53.4% of projects fall in the 3-to-5-year completion window.
+    - Timeline Duration: Average duration of 4.38 years (1,598 days); median of 4.25 years (1,550 days). 53.2% of projects fall in the 3-to-5-year completion window.
     - Financial Variance: Total cost difference of -₹553.25 Crores (-0.36% overall net variance). Commercial developments showed +2.38% cost expansion (+₹61.56 Cr), while mixed developments delivered -1.06% savings (-₹714.50 Cr).
 
 ### 2. White-Label Assessment Platform
