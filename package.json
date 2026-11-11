@@ -10,7 +10,10 @@
     "typecheck": "tsc --noEmit",
     "audit": "node scripts/audit-all.mjs",
     "optimize-assets": "node scripts/optimize-assets.mjs",
-    "ping-search": "node scripts/ping-search-engines.mjs"
+    "ping-search": "node scripts/ping-search-engines.mjs",
+    "blog:check": "node scripts/check-blog-post.mjs",
+    "blog:draft": "node scripts/blog-draft.mjs",
+    "seo:watch": "node scripts/seo-watch.mjs"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.3.2",

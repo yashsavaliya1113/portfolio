@@ -1,0 +1,90 @@
+name: Weekly SEO watch
+
+# Every Monday: health-check the live site, run Lighthouse, check where the site ranks for target queries and whether
+# AI search cites it, then post a report on a rolling GitHub issue. If something needs attention (a page broke, a score
+# dropped, or the site newly appears in search/AI results) a separate "SEO watch alert" issue is opened, which emails you.
+# Setup (optional API keys, notifications): see docs/automation.md
+
+on:
+  schedule:
+    - cron: "0 5 * * 1" # Mondays 05:00 UTC (10:30 IST), after the blog draft job
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: weekly-seo-watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
+      GOOGLE_CSE_KEY: ${{ secrets.GOOGLE_CSE_KEY }}
+      GOOGLE_CSE_CX: ${{ secrets.GOOGLE_CSE_CX }}
+      PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Lighthouse on the live site
+        run: |
+          mkdir -p lh
+          SITE=$(node -p "require('./automation/seo-queries.json').site")
+          i=0
+          for p in $(node -p "require('./automation/seo-queries.json').lighthousePages.join(' ')"); do
+            i=$((i+1))
+            npx --yes lighthouse@12 "$SITE$p" --quiet \
+              --chrome-flags="--headless=new --no-sandbox" \
+              --only-categories=performance,accessibility,best-practices,seo \
+              --output=json --output-path="lh/page$i.json" || echo "Lighthouse failed for $p"
+          done
+
+      - name: Find the tracking issue and load last week's state
+        id: issue
+        run: |
+          gh label create seo-watch --color 0e8a16 --description "Weekly SEO watch report" 2>/dev/null || true
+          gh label create seo-alert --color d93f0b --description "SEO or visibility alert" 2>/dev/null || true
+          num=$(gh issue list --label seo-watch --state open --json number --jq '.[0].number // empty')
+          if [ -z "$num" ]; then
+            url=$(gh issue create --label seo-watch \
+              --title "Weekly SEO watch (rolling report)" \
+              --body "Each Monday the SEO watch workflow adds a report here. Alerts are raised as separate issues labelled seo-alert.")
+            num=${url##*/}
+          fi
+          echo "num=$num" >> "$GITHUB_OUTPUT"
+          gh issue view "$num" --json comments --jq '.comments[-1].body // ""' > last.md || true
+          grep -o '<!--seo-state:[A-Za-z0-9+/=]*-->' last.md | tail -1 | sed 's/<!--seo-state://; s/-->//' | base64 -d > prev-state.json 2>/dev/null || true
+          [ -s prev-state.json ] || rm -f prev-state.json
+
+      - name: Run the SEO watch
+        run: node scripts/seo-watch.mjs
+
+      - name: Post the report and raise alerts
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: |
+          num="${{ steps.issue.outputs.num }}"
+          { cat report.md; echo; echo "<!--seo-state:$(base64 -w0 state.json)-->"; } > comment.md
+          gh issue comment "$num" --body-file comment.md
+          if [ -f alerts.md ]; then
+            {
+              echo "The weekly SEO watch found something that needs your attention:"
+              echo
+              cat alerts.md
+              echo
+              echo "Full report: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/issues/${num}"
+            } > alert-body.md
+            gh issue create --label seo-alert --title "SEO watch alert $(date -u +%F)" --body-file alert-body.md
+            if [ -n "$NTFY_TOPIC" ]; then
+              curl -s -H "Title: SEO watch alert" -d "$(head -c 400 alerts.md)" "https://ntfy.sh/$NTFY_TOPIC" > /dev/null || true
+            fi
+          fi

@@ -7,3 +7,6 @@ dist
 *.tsbuildinfo
 lighthouse*.json
 *-original.*
+
+# OpenCode local state
+.opencode/
