@@ -34,9 +34,6 @@ jobs:
 
       - run: npm ci
 
-      - name: Install the Playwright browser
-        run: npx playwright install --with-deps chromium
-
       - name: Lighthouse on the live site
         run: |
           mkdir -p lh
@@ -59,6 +56,8 @@ jobs:
           fi
 
       - name: Run the SEO watch
+        env:
+          PW_CHANNEL: chrome # use the Chrome already installed on the runner, so no browser download or apt install is needed
         run: node scripts/seo-watch.mjs
 
       - name: Show the report on the run summary
