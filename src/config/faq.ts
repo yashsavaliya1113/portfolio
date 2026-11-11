@@ -9,13 +9,13 @@ export const faqs: FaqItem[] = [
   {
     question: "Who is Yash Savaliya?",
     answer:
-      "Yash Savaliya is a Full Stack .NET Developer and aspiring Data Analyst based in Ahmedabad, Gujarat, India. He holds a B.Tech in Information Technology from RK University and works at iTechOps, where he joined as a Software Development Intern in July 2024 and became a full-time developer in November 2024.",
+      "Yash Savaliya is a Full Stack .NET Developer and Data Analyst based in Ahmedabad, Gujarat, India. He holds a B.Tech in Information Technology from RK University and works at iTechOps, where he joined as a Software Development Intern in July 2024 and became a full-time developer in November 2024.",
     links: [{ label: "About Yash", href: "/#about" }],
   },
   {
     question: "What technologies does Yash work with?",
     answer:
-      "On the engineering side: C#, ASP.NET Core, Entity Framework Core, Angular, SQL Server, Azure SQL, PostgreSQL, Redis, RabbitMQ and Microsoft Azure. On the analytics side: SQL, Python with Pandas, and Excel. He is also learning AI integration with Azure OpenAI and Semantic Kernel.",
+      "On the engineering side: C#, ASP.NET Core, Entity Framework Core, Angular, SQL Server, Azure SQL, PostgreSQL, Redis, RabbitMQ and Microsoft Azure. On the analytics side: SQL, Python with Pandas, Excel and Power BI. He is also learning AI integration with Azure OpenAI and Semantic Kernel.",
     links: [{ label: "Skills", href: "/#skills" }],
   },
   {

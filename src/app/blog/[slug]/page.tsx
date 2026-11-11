@@ -112,7 +112,7 @@ export default async function BlogPostPage({ params }: Props) {
               <Link href="/#about" className="font-medium text-primary hover:underline" rel="author">
                 {profile.name}
               </Link>
-              , Full Stack .NET Developer
+              , Full Stack .NET Developer and Data Analyst
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               <span className="rounded-full bg-primary/10 px-3 py-1 text-xs text-primary">{post.category}</span>
@@ -196,7 +196,7 @@ export default async function BlogPostPage({ params }: Props) {
         <aside className="mt-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5" aria-label="About the author">
           <h2 className="font-heading text-base font-semibold">About the author</h2>
           <p className="mt-2 text-sm text-[var(--color-muted)]">
-            {profile.name} is a Full Stack .NET Developer and aspiring Data Analyst in Ahmedabad, India. He builds SaaS
+            {profile.name} is a Full Stack .NET Developer and Data Analyst in Ahmedabad, India. He builds SaaS
             platforms with ASP.NET Core, Angular and Azure at iTechOps.{" "}
             <Link href="/#about" className="text-primary hover:underline">More about Yash</Link>
             {" · "}
