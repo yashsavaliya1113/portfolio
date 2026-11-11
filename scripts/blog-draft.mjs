@@ -8,7 +8,11 @@ import { fileURLToPath } from "url";
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const today = new Date().toISOString().slice(0, 10);
 const prompt = `TODAY=${today}\n\n` + fs.readFileSync(path.join(root, "automation", "prompts", "weekly-blog.md"), "utf8").replaceAll("TODAY", today);
-const model = process.env.OPENCODE_MODEL; // optional, e.g. anthropic/claude-sonnet-4-5
+const model = process.env.OPENCODE_MODEL || "opencode/deepseek-v4-pro"; // OpenCode model, e.g. opencode/deepseek-v4-pro (run `opencode models`)
+if (model && /claude|anthropic/i.test(model)) {
+  console.error(`Claude/Anthropic models are not used for blog drafts (got ${model}). Pick an OpenCode model.`);
+  process.exit(1);
+}
 const args = ["run", ...(model ? ["--model", model] : []), prompt];
 
 if (process.argv.includes("--dry")) {

@@ -22,13 +22,22 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      # OpenCode's own provider ("opencode/<model>"). This workflow deliberately does not use Claude/Anthropic models.
+      OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+      OPENCODE_MODEL: ${{ vars.OPENCODE_MODEL || 'opencode/deepseek-v4-pro' }}
     steps:
-      - name: Check that an AI provider key is configured
+      - name: Check the OpenCode key and model
         run: |
-          if [ -z "$ANTHROPIC_API_KEY" ] && [ -z "$OPENAI_API_KEY" ]; then
-            echo "::error::Add ANTHROPIC_API_KEY (or OPENAI_API_KEY) as a repository secret. See docs/automation.md"
+          if [ -z "$OPENCODE_API_KEY" ]; then
+            echo "::error::Add OPENCODE_API_KEY as a repository secret. See docs/automation.md"
+            exit 1
+          fi
+          case "$OPENCODE_MODEL" in
+            opencode/*) ;;
+            *) echo "::error::OPENCODE_MODEL must be an OpenCode model like opencode/deepseek-v4-pro (got $OPENCODE_MODEL)"; exit 1 ;;
+          esac
+          if echo "$OPENCODE_MODEL" | grep -qiE 'claude|anthropic'; then
+            echo "::error::Claude/Anthropic models are not allowed in this workflow (got $OPENCODE_MODEL)"
             exit 1
           fi
 
@@ -42,7 +51,7 @@ jobs:
       - run: npm ci
 
       - name: Install OpenCode
-        run: npm install -g ${{ vars.OPENCODE_PACKAGE || 'opencode-ai' }}
+        run: npm install -g ${{ vars.OPENCODE_PACKAGE || '@opencode/cli@2.2.7' }}
 
       - name: Write the article with OpenCode
         run: |
@@ -50,10 +59,9 @@ jobs:
           PROMPT="TODAY=$TODAY
 
           $(sed "s/TODAY/$TODAY/g" automation/prompts/weekly-blog.md)"
-          MODEL="${{ vars.OPENCODE_MODEL || 'anthropic/claude-sonnet-4-5' }}"
           EXTRA=""
           if opencode run --help 2>&1 | grep -q -- "--auto"; then EXTRA="--auto"; fi
-          opencode run --model "$MODEL" $EXTRA "$PROMPT"
+          opencode run --model "$OPENCODE_MODEL" $EXTRA "$PROMPT"
 
       - name: Guard - only the article and the topic list may change
         id: guard
@@ -87,7 +95,7 @@ jobs:
           commit-message: "content(blog): draft - ${{ steps.guard.outputs.title }}"
           title: "Weekly blog draft: ${{ steps.guard.outputs.title }}"
           body: |
-            Drafted by OpenCode from `automation/blog-topics.md`. **Please review before merging.**
+            Drafted by OpenCode (model `${{ vars.OPENCODE_MODEL || 'opencode/deepseek-v4-pro' }}`) from `automation/blog-topics.md`. **Please review before merging.**
 
             Checks already passed in this run: file guard (only the article and topic list changed), `scripts/check-blog-post.mjs` quality gate, full site build and `npm run audit`.
 

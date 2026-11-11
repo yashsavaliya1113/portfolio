@@ -4,7 +4,7 @@ Two GitHub Actions workflows run every Monday. Neither publishes anything by its
 
 | Workflow | When (UTC) | What it does | How you hear about it |
 | --- | --- | --- | --- |
-| `weekly-blog.yml` | Mon 04:30 | OpenCode writes one article from `automation/blog-topics.md`, the build and audit run, and a **draft pull request** is opened | GitHub email: new pull request. You review and merge to publish |
+| `weekly-blog.yml` | Mon 04:30 | OpenCode (OpenCode's own models, no Claude) writes one article from `automation/blog-topics.md`, the build and audit run, and a **draft pull request** is opened | GitHub email: new pull request. You review and merge to publish |
 | `weekly-seo-watch.yml` | Mon 05:00 | Health check of the live site, Lighthouse, search rankings, AI-search citations; report posted on a rolling issue | GitHub email: new issue labelled `seo-alert` **only when something needs attention** |
 
 Run either one on demand: GitHub, Actions tab, pick the workflow, Run workflow.
@@ -13,7 +13,7 @@ Run either one on demand: GitHub, Actions tab, pick the workflow, Run workflow.
 
 1. **Allow Actions to open pull requests.** Repository, Settings, Actions, General, Workflow permissions: choose "Read and write permissions" and tick "Allow GitHub Actions to create and approve pull requests".
 2. **Turn on email notifications.** GitHub, Settings, Notifications: make sure you are watching this repository (the owner is by default) and that email is on for issues and pull requests.
-3. **Blog drafting needs an AI key.** Settings, Secrets and variables, Actions, New repository secret: `ANTHROPIC_API_KEY` (or `OPENAI_API_KEY`). Optional repository variables: `OPENCODE_MODEL` (default `anthropic/claude-sonnet-4-5`, format `provider/model`) and `OPENCODE_PACKAGE` (default `opencode-ai`; use `@opencode/cli@2.2.7` to match a newer local install).
+3. **Blog drafting uses OpenCode only, with an OpenCode key.** Settings, Secrets and variables, Actions, New repository secret: `OPENCODE_API_KEY`. Optional repository variables: `OPENCODE_MODEL` (default `opencode/deepseek-v4-pro`; run `opencode models` locally to see the list, including `-free` models) and `OPENCODE_PACKAGE` (default `@opencode/cli@2.2.7`, the version this was written against). The workflow refuses any model that is not an `opencode/...` model or that contains `claude` or `anthropic`.
 4. **Search and AI tracking need keys (all optional).** Without them the weekly report still runs health checks and Lighthouse, and says what is not configured.
 
 | Secret | Used for | Notes |
