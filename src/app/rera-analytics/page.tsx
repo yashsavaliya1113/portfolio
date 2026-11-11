@@ -27,7 +27,7 @@ export default function ReraAnalyticsPage() {
         <p className="mt-3 max-w-3xl text-[var(--color-muted)]">
           A live data-analytics dashboard for 5,478 registered Ahmedabad real estate projects. The raw GujRERA export is
           cleaned in your browser and turned into cost, timeline and variance charts. See the{" "}
-          <Link href="/projects/ahmedabad-rera-data-analytics/" className="text-primary hover:underline">
+          <Link href="/projects/ahmedabad-rera-data-analytics/" className="text-primary underline underline-offset-2 hover:no-underline">
             project case study
           </Link>{" "}
           for the method.

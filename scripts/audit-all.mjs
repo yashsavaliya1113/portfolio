@@ -114,9 +114,14 @@ for (const [loc, html] of pages) {
     checked++;
     let [p, hash] = href.split("#");
     p = p.startsWith("http") ? p.slice(SITE.length) : p;
+    // On GitHub Pages every root-relative URL must carry the base path, or it resolves to the domain root and 404s.
+    if (BASE && p.startsWith("/") && !p.startsWith("//") && p !== BASE && !p.startsWith(`${BASE}/`) && !href.startsWith("http")) {
+      broken.push(`${loc} -> ${href} (missing base path ${BASE})`);
+      continue;
+    }
     if (p.startsWith(BASE)) p = p.slice(BASE.length);
     if (p === "") p = new URL(loc).pathname.slice(BASE.length) || "/";
-    const target = path.join(outDir, p.replace(/^\//, ""), p.endsWith(".pdf") || p.endsWith(".xml") || p.endsWith(".txt") ? "" : "index.html");
+    const target = path.join(outDir, p.replace(/^\//, ""), path.extname(p) ? "" : "index.html");
     const content = loadPage(target);
     if (content === null && !fs.existsSync(target)) {
       broken.push(`${loc} -> ${href}`);

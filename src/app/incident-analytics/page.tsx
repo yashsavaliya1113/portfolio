@@ -1,10 +1,12 @@
+import fs from "fs";
+import path from "path";
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { TriangleAlert } from "lucide-react";
 import { JsonLd } from "@/components/JsonLd";
 import { breadcrumbJsonLd } from "@/lib/seo";
-import { IncidentAnalyticsShowcase } from "@/components/IncidentAnalyticsShowcase";
+import { IncidentAnalyticsShowcase, type Insights } from "@/components/IncidentAnalyticsShowcase";
 
 export const metadata: Metadata = pageMetadata({
   title: "SaaS Reliability & Incident Intelligence Dashboard",
@@ -15,6 +17,9 @@ export const metadata: Metadata = pageMetadata({
 });
 
 export default function IncidentAnalyticsPage() {
+  const data = JSON.parse(
+    fs.readFileSync(path.join(process.cwd(), "public", "data", "saas-incident-insights.json"), "utf8"),
+  ) as Insights;
   return (
     <div className="pt-24 pb-20">
       <JsonLd data={breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Projects", path: "/#projects" }, { name: "SaaS Reliability Dashboard", path: "/incident-analytics" }])} />
@@ -31,7 +36,7 @@ export default function IncidentAnalyticsPage() {
         <p className="mt-3 max-w-3xl text-[var(--color-muted)]">
           An operational analytics dashboard for a fictional SaaS company: which services fail most, what takes longest to
           resolve, where SLAs are breached, and which alerts are just noise. Read the{" "}
-          <Link href="/projects/saas-reliability-incident-intelligence/" className="text-primary hover:underline">
+          <Link href="/projects/saas-reliability-incident-intelligence/" className="text-primary underline underline-offset-2 hover:no-underline">
             project case study
           </Link>{" "}
           for the method.
@@ -45,7 +50,7 @@ export default function IncidentAnalyticsPage() {
           </p>
         </div>
         <div className="mt-6">
-          <IncidentAnalyticsShowcase />
+          <IncidentAnalyticsShowcase data={data} />
         </div>
       </div>
     </div>

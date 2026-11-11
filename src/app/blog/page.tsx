@@ -47,8 +47,8 @@ export default function BlogPage() {
           <p className="mt-3 max-w-2xl text-[var(--color-muted)]">
             Practical notes on building and running software: ASP.NET Core APIs, SQL performance, Python automation,
             Azure deployments and AI integration in .NET. For the projects behind them, see{" "}
-            <Link className="text-primary hover:underline" href="/#projects">my projects</Link> and the{" "}
-            <Link className="text-primary hover:underline" href="/ai-lab/">AI Lab</Link>.
+            <Link className="text-primary underline underline-offset-2 hover:no-underline" href="/#projects">my projects</Link> and the{" "}
+            <Link className="text-primary underline underline-offset-2 hover:no-underline" href="/ai-lab/">AI Lab</Link>.
           </p>
         </div>
         <BlogListClient posts={posts} />

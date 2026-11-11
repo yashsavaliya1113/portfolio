@@ -78,7 +78,7 @@ export default function AILabPage() {
             <strong className="text-[var(--color-text)]">Planned</strong> mean I am still studying or have not started
             building, and no results are claimed. Background reading:{" "}
             {aiPost ? (
-              <Link href={`/blog/${aiPost.slug}/`} className="text-primary hover:underline">
+              <Link href={`/blog/${aiPost.slug}/`} className="text-primary underline underline-offset-2 hover:no-underline">
                 {aiPost.title}
               </Link>
             ) : (
@@ -122,12 +122,12 @@ export default function AILabPage() {
               <div className="mt-5 flex flex-wrap gap-x-4 gap-y-1.5 pt-1 text-sm">
                 {e.links.map((l) =>
                   l.external ? (
-                    <a key={l.href} href={l.href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-medium text-primary hover:underline">
+                    <a key={l.href} href={l.href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-medium text-primary underline underline-offset-2 hover:no-underline">
                       {l.label}
                       <ArrowUpRight size={13} aria-hidden="true" />
                     </a>
                   ) : (
-                    <Link key={l.href} href={l.href} className="font-medium text-primary hover:underline">
+                    <Link key={l.href} href={l.href} className="font-medium text-primary underline underline-offset-2 hover:no-underline">
                       {l.label}
                     </Link>
                   ),
@@ -153,15 +153,15 @@ export default function AILabPage() {
           <h2 className="font-heading text-xl font-bold">Explore more</h2>
           <ul className="mt-3 space-y-2 text-sm">
             <li>
-              <Link href="/#projects" className="font-medium text-primary hover:underline">Projects</Link>
+              <Link href="/#projects" className="font-medium text-primary underline underline-offset-2 hover:no-underline">Projects</Link>
               <span className="text-[var(--color-muted)]"> — including the SaaS incident analytics study these experiments build on.</span>
             </li>
             <li>
-              <Link href="/blog/" className="font-medium text-primary hover:underline">Blog</Link>
+              <Link href="/blog/" className="font-medium text-primary underline underline-offset-2 hover:no-underline">Blog</Link>
               <span className="text-[var(--color-muted)]"> — practical articles on ASP.NET Core, SQL, Python, Azure and AI.</span>
             </li>
             <li>
-              <Link href="/#about" className="font-medium text-primary hover:underline">About Yash Savaliya</Link>
+              <Link href="/#about" className="font-medium text-primary underline underline-offset-2 hover:no-underline">About Yash Savaliya</Link>
               <span className="text-[var(--color-muted)]"> — background, experience and contact details.</span>
             </li>
           </ul>

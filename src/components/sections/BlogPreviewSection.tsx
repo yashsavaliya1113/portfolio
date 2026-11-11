@@ -18,7 +18,7 @@ export function BlogPreviewSection() {
           ))}
         </div>
         <div className="mt-8">
-          <Link href="/blog/" className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline">
+          <Link href="/blog/" className="inline-flex items-center gap-1.5 text-sm font-medium text-primary underline underline-offset-2 hover:no-underline">
             All articles
             <ArrowRight size={14} aria-hidden="true" />
           </Link>

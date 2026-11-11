@@ -6,6 +6,14 @@ import { Marked } from "marked";
 
 const contentDir = path.join(process.cwd(), "content", "blog");
 
+// Articles link to pages as "/blog/..."; on GitHub Pages the site is served under a base path ("/portfolio").
+const basePath =
+  process.env.NEXT_PUBLIC_BASE_PATH !== undefined
+    ? process.env.NEXT_PUBLIC_BASE_PATH
+    : process.env.NODE_ENV === "production"
+      ? "/portfolio"
+      : "";
+
 export interface BlogReference {
   title: string;
   url: string;
@@ -111,11 +119,13 @@ export function getPostBySlug(slug: string) {
         const text = this.parser.parseInline(tokens);
         const external = /^https?:\/\//.test(href);
         const attrs = external ? ' target="_blank" rel="noopener noreferrer"' : "";
-        return `<a href="${href}"${title ? ` title="${title}"` : ""}${attrs}>${text}</a>`;
+        const url = href.startsWith("/") && !href.startsWith("//") ? `${basePath}${href}` : href;
+        return `<a href="${url}"${title ? ` title="${title}"` : ""}${attrs}>${text}</a>`;
       },
     },
   });
-  const html = renderer.parse(content, { async: false }) as string;
+  // <pre> blocks can scroll horizontally, so make them keyboard focusable (WCAG 2.1.1).
+  const html = (renderer.parse(content, { async: false }) as string).replace(/<pre>/g, '<pre tabindex="0">');
   const toc: TocItem[] = headings.filter((h) => h.depth === 2 || h.depth === 3);
   const wordCount = content.split(/\s+/).filter(Boolean).length;
 

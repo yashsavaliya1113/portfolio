@@ -240,7 +240,7 @@ export default async function ProjectPage({ params }: Props) {
             <ul className="space-y-2 text-sm">
               {articles.map((a) => (
                 <li key={a.slug}>
-                  <Link href={`/blog/${a.slug}/`} className="font-medium text-primary hover:underline">
+                  <Link href={`/blog/${a.slug}/`} className="font-medium text-primary underline underline-offset-2 hover:no-underline">
                     {a.title}
                   </Link>
                 </li>
