@@ -1,6 +1,6 @@
 # Yash Savaliya
 
-> Yash Savaliya is a Full Stack .NET Developer and aspiring Data Analyst based in Ahmedabad, Gujarat, India. He builds SaaS applications with ASP.NET Core, Angular and Azure at iTechOps (since 2024) and analyzes data with SQL, Python (Pandas) and Excel.
+> Yash Savaliya is a Full Stack .NET Developer and Data Analyst based in Ahmedabad, Gujarat, India. He builds SaaS applications with ASP.NET Core, Angular and Azure at iTechOps (since 2024) and analyzes data with SQL, Python (Pandas), Excel and Power BI.
 
 ## About
 - Name: Yash Savaliya
