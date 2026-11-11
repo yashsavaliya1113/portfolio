@@ -136,6 +136,10 @@ const nf = path.join(outDir, "404.html");
 const nfHtml = fs.existsSync(nf) ? fs.readFileSync(nf, "utf8") : "";
 record("robots", "Custom 404 page exists and is noindex", nfHtml.includes("Page not found") && /noindex/.test(nfHtml));
 record("robots", "llms.txt exists", fs.existsSync(path.join(outDir, "llms.txt")));
+for (const f of ["resume-dotnet-developer.pdf", "resume-data-analyst.pdf", "resume.pdf"]) {
+  const fp = path.join(outDir, f);
+  record("robots", `Resume PDF present: ${f}`, fs.existsSync(fp) && fs.readFileSync(fp).subarray(0, 4).toString() === "%PDF");
+}
 
 // ---- Performance guards ---------------------------------------------------------------
 const cssDir = path.join(outDir, "_next", "static", "css");

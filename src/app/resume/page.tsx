@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { JsonLd } from "@/components/JsonLd";
+import { ResumeDownload } from "@/components/ResumeDownload";
 import { absoluteUrl, breadcrumbJsonLd, pageMetadata, personId } from "@/lib/seo";
 import { FileDown, GraduationCap } from "lucide-react";
 import { profile } from "@/config/profile";
@@ -38,15 +39,7 @@ export default function ResumePage() {
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
         <div className="flex items-center justify-between mb-8 animate-fade-up" style={{ animationFillMode: "both" }}>
           <h1 className="font-heading text-3xl font-bold tracking-tight">Resume</h1>
-          <a
-            href={profile.resumeUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-primary-dark"
-          >
-            <FileDown size={14} />
-            Download PDF
-          </a>
+          <ResumeDownload label="Download PDF" variant="primary" align="right" />
         </div>
 
         <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 animate-fade-up" style={{ animationDelay: "0.1s", animationFillMode: "both" }}>
