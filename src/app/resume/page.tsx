@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/JsonLd";
+import { absoluteUrl, breadcrumbJsonLd, pageMetadata, personId } from "@/lib/seo";
 import { FileDown, GraduationCap } from "lucide-react";
 import { profile } from "@/config/profile";
 import { experiences } from "@/config/experience";
@@ -6,72 +8,33 @@ import { skillCategories } from "@/config/skills";
 import { siteConfig } from "@/config/site";
 import { education } from "@/config/education";
 
-export const metadata: Metadata = {
-  title: "Resume",
-  description: `Professional Resume of ${profile.name} — ${profile.title}. Experience in ASP.NET Core, Angular, Microservices, Azure, and Agentic AI.`,
-  openGraph: {
-    title: `Resume — ${profile.name}`,
-    description: `Professional Resume of ${profile.name} — ${profile.title}. Experience in ASP.NET Core, Angular, Microservices, Azure, and Agentic AI.`,
-    url: `${siteConfig.url}/resume`,
-    images: [
-      {
-        url: `${siteConfig.url}/og.png`,
-        width: 1200,
-        height: 630,
-        alt: `Resume — ${profile.name}`,
-      },
-    ],
-  },
-  twitter: {
-    title: `Resume — ${profile.name}`,
-    description: `Professional Resume of ${profile.name} — ${profile.title}. Experience in ASP.NET Core, Angular, Microservices, Azure, and Agentic AI.`,
-  },
-  alternates: {
-    canonical: `${siteConfig.url}/resume`,
-  },
-  keywords: [
-    "Yash Savaliya resume",
-    ".NET Developer CV",
-    "Full Stack .NET resume",
-    "ASP.NET Core developer resume",
-    "Angular developer India",
-    "Ahmedabad software engineer",
-  ],
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Resume: Full Stack .NET Developer and Data Analyst",
+  description:
+    "Resume of Yash Savaliya: 2+ years building SaaS platforms with ASP.NET Core, Angular and Azure, plus SQL, Python and Excel data analysis. Ahmedabad, India.",
+  path: "/resume",
+  keywords: ["Yash Savaliya resume", ".NET Developer resume", "ASP.NET Core developer", "Data Analyst"],
+});
 
 export default function ResumePage() {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "ProfilePage",
-    name: `Resume — ${profile.name}`,
-    description: profile.about,
-    url: `${siteConfig.url}/resume`,
-    mainEntity: {
-      "@type": "Person",
-      name: profile.name,
-      jobTitle: profile.title,
-      description: profile.about,
-      email: siteConfig.links.email,
-      telephone: "+918104017448",
-      address: {
-        "@type": "PostalAddress",
-        addressLocality: "Ahmedabad",
-        addressRegion: "Gujarat",
-        addressCountry: "IN",
-      },
-      alumniOf: {
-        "@type": "CollegeOrUniversity",
-        name: "RK University",
-      },
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfilePage",
+      "@id": `${absoluteUrl("/resume")}#profile`,
+      name: `Resume: ${profile.name}`,
+      url: absoluteUrl("/resume"),
+      mainEntity: { "@id": personId },
     },
-  };
+    breadcrumbJsonLd([
+      { name: "Home", path: "/" },
+      { name: "Resume", path: "/resume" },
+    ]),
+  ];
 
   return (
     <div className="pt-24 pb-20">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
         <div className="flex items-center justify-between mb-8 animate-fade-up" style={{ animationFillMode: "both" }}>
           <h1 className="font-heading text-3xl font-bold tracking-tight">Resume</h1>

@@ -1,5 +1,3 @@
-"use client";
-
 import { ArrowUpRight } from "lucide-react";
 import { GitHubIcon } from "@/components/GitHubIcon";
 import Link from "next/link";

@@ -1,5 +1,3 @@
-"use client";
-
 import { GraduationCap } from "lucide-react";
 import { SectionHeading } from "@/components/SectionHeading";
 import { profile } from "@/config/profile";
@@ -24,9 +22,7 @@ export function AboutSection() {
             <div className="mb-8 flex items-center gap-6 animate-fade-up" style={{ animationFillMode: "both" }}>
               <div className="h-20 w-20 shrink-0 overflow-hidden rounded-2xl border border-[var(--color-border)]">
                 <picture>
-                  {profile.avatarWebp && (
-                    <source srcSet={profile.avatarWebp} type="image/webp" />
-                  )}
+                  <source srcSet={profile.avatarSmall} type="image/webp" />
                   <img
                     src={profile.avatar}
                     alt={`${profile.name} portrait`}

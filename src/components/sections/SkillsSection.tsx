@@ -1,5 +1,3 @@
-"use client";
-
 import { Server, Globe, FolderTree, Cloud, Database, ShieldCheck, Bot, BarChart3 } from "lucide-react";
 import { SectionHeading } from "@/components/SectionHeading";
 import { SkillBadge } from "@/components/SkillBadge";
@@ -18,7 +16,7 @@ const categoryIcons: Record<string, React.ReactNode> = {
 
 export function SkillsSection() {
   return (
-    <section className="border-t border-[var(--color-border)] py-20">
+    <section id="skills" className="border-t border-[var(--color-border)] py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading title="Skills" subtitle="Technologies and tools I work with." />
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

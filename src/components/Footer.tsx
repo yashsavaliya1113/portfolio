@@ -14,7 +14,7 @@ export function Footer() {
               <span className="text-primary">.</span>
             </Link>
             <p className="mt-2 max-w-xs text-sm text-[var(--color-muted)] leading-relaxed">
-              Full Stack .NET Developer building production-grade SaaS applications with ASP.NET Core, Angular, and Azure.
+              Full Stack .NET Developer and Data Analyst in Ahmedabad, India. Building SaaS applications with ASP.NET Core, Angular and Azure, and analyzing data with SQL, Python and Excel.
             </p>
           </div>
           <div>

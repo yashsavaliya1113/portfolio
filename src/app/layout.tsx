@@ -3,20 +3,23 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ToastProvider } from "@/components/Toaster";
+import { JsonLd } from "@/components/JsonLd";
 import { siteConfig } from "@/config/site";
 import { profile } from "@/config/profile";
+import { absoluteUrl, personId, sameAs, websiteId } from "@/lib/seo";
 import "@/styles/globals.css";
 
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
-  display: "swap",
+  display: "optional",
 });
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
   display: "swap",
+  preload: false,
 });
 
 const basePath =
@@ -27,248 +30,133 @@ const basePath =
       : "";
 
 const description =
-  "Data Analyst & Full Stack Developer with 2+ years of experience in data analytics, financial variance modeling, SQL, Excel advanced dashboards, and SaaS architecture. Based in Ahmedabad, India.";
+  "Yash Savaliya is a Full Stack .NET Developer and Data Analyst in Ahmedabad, India. ASP.NET Core, Azure, SQL and Python projects, technical articles and AI experiments.";
 
 export const viewport: Viewport = {
-  themeColor: "#09090b",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#09090b" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+  ],
   width: "device-width",
   initialScale: 1,
-  maximumScale: 5,
 };
 
 export const metadata: Metadata = {
   title: {
-    default: `${profile.name} — ${profile.title}`,
-    template: `%s — ${profile.name}`,
+    default: `${profile.name} | ${profile.title}`,
+    template: `%s | ${profile.name}`,
   },
   description,
-  metadataBase: new URL(siteConfig.url),
-  keywords: [
-    "Yash Savaliya",
-    "Data Analyst",
-    "Data Analytics India",
-    "Business Intelligence",
-    "Excel Advanced Modeling",
-    "Full Stack Developer",
-    ".NET Developer",
-    "ASP.NET Core",
-    "Angular Developer",
-    "SQL Server",
-    "Azure",
-    "SaaS Platform",
-    "Ahmedabad Data Analyst",
-    "Gujarat Software Engineer",
-    "Agentic AI",
-  ],
-  authors: [{ name: profile.name, url: siteConfig.url }],
+  metadataBase: new URL(`${siteConfig.url}/`),
+  authors: [{ name: profile.name, url: absoluteUrl("/") }],
   creator: profile.name,
   publisher: profile.name,
-  category: "technology",
   icons: {
     icon: [
       { url: `${basePath}/favicon.png`, sizes: "48x48", type: "image/png" },
       { url: `${basePath}/icon.svg`, type: "image/svg+xml" },
     ],
-    apple: [
-      { url: `${basePath}/apple-touch-icon.png`, sizes: "180x180", type: "image/png" },
-    ],
+    apple: [{ url: `${basePath}/apple-touch-icon.png`, sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
     type: "website",
-    locale: "en_US",
-    url: siteConfig.url,
-    title: `${profile.name} — ${profile.title}`,
+    locale: "en_IN",
+    url: absoluteUrl("/"),
+    title: `${profile.name} | ${profile.title}`,
     description,
     siteName: profile.name,
     images: [
-      {
-        url: `${siteConfig.url}/og.png`,
-        width: 1200,
-        height: 630,
-        alt: `${profile.name} — Full Stack .NET Developer`,
-      },
+      { url: `${siteConfig.url}/og.png`, width: 1200, height: 630, alt: `${profile.name}, ${profile.title}` },
     ],
-    countryName: "India",
   },
   twitter: {
     card: "summary_large_image",
-    title: `${profile.name} — ${profile.title}`,
+    title: `${profile.name} | ${profile.title}`,
     description,
     images: [`${siteConfig.url}/og.png`],
   },
   robots: {
     index: true,
     follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
   },
   alternates: {
-    canonical: siteConfig.url,
-    types: {
-      "application/rss+xml": `${siteConfig.url}/rss.xml`,
-    },
+    canonical: absoluteUrl("/"),
+    types: { "application/rss+xml": `${siteConfig.url}/rss.xml` },
   },
-  appleWebApp: {
-    title: profile.name,
-    statusBarStyle: "black-translucent",
-  },
-  formatDetection: {
-    telephone: true,
-    email: true,
-    address: true,
-  },
-  other: {
-    "geo.region": "IN-GJ",
-    "geo.placename": "Ahmedabad, Gujarat, India",
-    "geo.position": "23.0225;72.5714",
-    "ICBM": "23.0225, 72.5714",
-    "rating": "General",
-    "revisit-after": "7 days",
-  },
-  verification: {
-    google: "google2f75ccea5a94c8d4",
-  },
+  verification: { google: "google2f75ccea5a94c8d4" },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  // Site-wide identity. Only facts that are visible on the site are described here.
   const jsonLd = [
     {
       "@context": "https://schema.org",
-      "@type": "ProfilePage",
-      name: `${profile.name} — Portfolio`,
-      url: siteConfig.url,
-      description,
-      mainEntity: {
-        "@type": "Person",
-        name: profile.name,
-        givenName: "Yash",
-        familyName: "Savaliya",
-        jobTitle: profile.title,
-        description: profile.about,
-        url: siteConfig.url,
-        email: siteConfig.links.email,
-        telephone: "+918104017448",
-        hasOccupation: {
-          "@type": "Occupation",
-          name: "Full Stack .NET Developer",
-          occupationalCategory: "15-1252.00",
-          skills:
-            "ASP.NET Core, C#, Angular, Azure, Microservices, CQRS, Semantic Kernel, Agentic AI",
-        },
-        address: {
-          "@type": "PostalAddress",
-          addressLocality: "Ahmedabad",
-          addressRegion: "Gujarat",
-          addressCountry: "IN",
-        },
-        geo: {
-          "@type": "GeoCoordinates",
-          latitude: 23.0225,
-          longitude: 72.5714,
-        },
-        nationality: "Indian",
-        sameAs: [
-          siteConfig.links.github,
-          siteConfig.links.linkedin,
-          `mailto:${siteConfig.links.email}`,
-        ],
-        knowsAbout: [
-          "C#",
-          "ASP.NET Core",
-          ".NET 8 / 10",
-          "Angular",
-          "Blazor",
-          "Azure",
-          "SQL Server",
-          "Redis",
-          "RabbitMQ",
-          "Keycloak",
-          "Semantic Kernel",
-          "Clean Architecture",
-          "CQRS",
-          "Microservices",
-          "GraphQL",
-          "Docker",
-          "Agentic AI",
-        ],
-        alumniOf: {
-          "@type": "CollegeOrUniversity",
-          name: "RK University",
-          location: "Rajkot, Gujarat, India",
-        },
-        worksFor: {
-          "@type": "Organization",
-          name: "iTechOps",
-        },
-        workLocation: {
-          "@type": "City",
-          name: "Ahmedabad",
-        },
+      "@type": "Person",
+      "@id": personId,
+      name: profile.name,
+      givenName: "Yash",
+      familyName: "Savaliya",
+      jobTitle: profile.title,
+      description: profile.about,
+      url: absoluteUrl("/"),
+      image: `${siteConfig.url}/avatar.jpg`,
+      email: `mailto:${siteConfig.links.email}`,
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Ahmedabad",
+        addressRegion: "Gujarat",
+        addressCountry: "IN",
       },
+      worksFor: { "@type": "Organization", name: "iTechOps" },
+      alumniOf: { "@type": "CollegeOrUniversity", name: "RK University" },
+      knowsAbout: [
+        "C#",
+        "ASP.NET Core",
+        "Entity Framework Core",
+        "Angular",
+        "Microsoft Azure",
+        "SQL Server",
+        "SQL",
+        "Python",
+        "Pandas",
+        "Data Analytics",
+        "Microservices",
+        "CQRS",
+      ],
+      sameAs,
     },
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
-      name: profile.name,
-      url: siteConfig.url,
+      "@id": websiteId,
+      name: `${profile.name} Portfolio`,
+      url: absoluteUrl("/"),
       description,
-      author: {
-        "@type": "Person",
-        name: profile.name,
-      },
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: siteConfig.url },
-        { "@type": "ListItem", position: 2, name: "Blog", item: `${siteConfig.url}/blog` },
-        { "@type": "ListItem", position: 3, name: "Projects", item: `${siteConfig.url}/#projects` },
-        { "@type": "ListItem", position: 4, name: "AI Lab", item: `${siteConfig.url}/ai-lab` },
-        { "@type": "ListItem", position: 5, name: "Resume", item: `${siteConfig.url}/resume` },
-      ],
+      inLanguage: "en",
+      publisher: { "@id": personId },
+      author: { "@id": personId },
     },
   ];
 
   const gaId = process.env.NEXT_PUBLIC_GA_ID || siteConfig.googleAnalyticsId;
+  // Analytics loads on first user interaction (or 5s after load), so it never competes with LCP/INP.
+  const gaLoader = gaId
+    ? `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${gaId}');var l=false;function load(){if(l)return;l=true;var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=${gaId}';document.head.appendChild(s);}['pointerdown','keydown','scroll','touchstart'].forEach(function(e){window.addEventListener(e,load,{once:true,passive:true});});window.addEventListener('load',function(){setTimeout(load,5000);});`
+    : "";
 
   return (
-    <html lang="en" className={`dark ${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en" className={`dark ${inter.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
       <head>
-        {gaId && (
-          <>
-            <script
-              async
-              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
-            />
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${gaId}',{page_path:window.location.pathname});`,
-              }}
-            />
-          </>
-        )}
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='light'){document.documentElement.classList.remove('dark')}else{document.documentElement.classList.add('dark')}}catch(e){}})()`,
           }}
         />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-        <link rel="canonical" href={siteConfig.url} />
+        <JsonLd data={jsonLd} />
         <link rel="me" href={siteConfig.links.github} />
         <link rel="me" href={siteConfig.links.linkedin} />
+        {gaLoader && <script dangerouslySetInnerHTML={{ __html: gaLoader }} />}
       </head>
       <body className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] antialiased">
         <a

@@ -3,9 +3,10 @@ import type { Project } from "@/types";
 export const projects: Project[] = [
   {
     slug: "ahmedabad-rera-data-analytics",
+    seoTitle: "Ahmedabad RERA Market & Cost Variance Analytics",
     title: "Ahmedabad Real Estate (RERA) Market & Cost Variance Analytics",
     description:
-      "Comprehensive data analytics dashboard examining 5,478 RERA real estate developments and ₹2.57 Lakh Crores in investment across Ahmedabad.",
+      "Comprehensive data analytics dashboard examining 5,478 RERA real estate developments and INR 2.57 lakh crore in investment across Ahmedabad.",
     fullDescription:
       "An end-to-end data analytics project examining 5,478 registered RERA projects in Ahmedabad, Gujarat. Features a live in-browser ETL pipeline (raw GujRERA CSV → cleaned metrics → charts), data quality audit metrics, project duration cohort distribution modeling (averaging 4.38 years), financial cost variance analysis across ₹2,56,864 Crores in capital investment, and dynamic multi-dimensional pivot tables with interactive slicers.",
     image: "/projects/rera-analytics.png",

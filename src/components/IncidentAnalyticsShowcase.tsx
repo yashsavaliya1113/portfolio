@@ -161,21 +161,7 @@ export function IncidentAnalyticsShowcase() {
   const noisy = data.alert_rules.filter((r) => r.noise_pct >= 75);
 
   return (
-    <div className="mt-6">
-      <h1 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl">SaaS Reliability &amp; Incident Intelligence</h1>
-      <p className="mt-3 max-w-3xl text-[var(--color-muted)]">
-        An operational analytics dashboard for a fictional SaaS company: which services fail most, what takes longest to
-        resolve, where SLAs are breached, and which alerts are just noise. {k.date_from} to {k.date_to}.
-      </p>
-
-      <div className="mt-5 flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
-        <TriangleAlert size={18} className="mt-0.5 shrink-0 text-amber-500" />
-        <p className="text-[var(--color-text)]">
-          <strong>Synthetic data.</strong> Every incident, alert and tenant here is randomly generated (fixed seed) and the
-          names are fictional. No employer or client data is used, so these findings describe the generated dataset, not any real company.
-        </p>
-      </div>
-
+    <div>
       <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Kpi label="Incidents" value={fmt(k.incidents)} note={`${fmt(k.alerts)} alerts`} />
         <Kpi label="Avg MTTR" value={`${k.avg_mttr_min} min`} note={`median ${k.median_mttr_min} min`} />

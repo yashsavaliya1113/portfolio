@@ -1,0 +1,158 @@
+---
+title: "Practical Python Automation: Turning Repetitive Tasks into Efficient Workflows"
+seoTitle: "Python Automation with Pandas: A Practical Guide"
+description: "Automate a reporting chore with Python and pandas: load monthly CSVs, clean messy data, remove duplicates, summarize and export Excel. Includes runnable code."
+date: "2026-11-11"
+modified: "2026-11-11"
+tags: ["Python", "Pandas", "Automation", "Data Cleaning", "Excel"]
+category: "Data & Automation"
+published: true
+relatedProjects: ["ahmedabad-rera-data-analytics", "saas-reliability-incident-intelligence"]
+relatedPosts: ["sql-query-optimization-techniques", "how-ai-is-changing-dotnet-development"]
+references:
+  - title: "pandas user guide: IO tools (CSV, Excel)"
+    url: "https://pandas.pydata.org/docs/user_guide/io.html"
+  - title: "pandas.pivot_table reference"
+    url: "https://pandas.pydata.org/docs/reference/api/pandas.pivot_table.html"
+  - title: "pandas.ExcelWriter reference"
+    url: "https://pandas.pydata.org/docs/reference/api/pandas.ExcelWriter.html"
+  - title: "pathlib: object-oriented filesystem paths (Python docs)"
+    url: "https://docs.python.org/3/library/pathlib.html"
+  - title: "Task Scheduler (Microsoft Learn)"
+    url: "https://learn.microsoft.com/windows/win32/taskschd/task-scheduler-start-page"
+---
+
+Many recurring tasks in a team follow the same pattern: someone exports a few files, copies them into a spreadsheet, fixes the same formatting problems, builds a summary and emails it. Python is a good fit for this pattern because the steps are mechanical, the inputs are files, and the output is a file. This article builds one such workflow end to end and points out the traps that make scripts fail on real data.
+
+The scenario: a folder of monthly order exports (`orders_2026-01.csv`, `orders_2026-02.csv`, ...) needs to become one clean dataset plus a summary workbook. The full script is under 60 lines and was run against deliberately messy sample files.
+
+## When automation is worth it
+
+Automate a task when it is repeated, rule-based and error-prone to do by hand. A useful test: if you can write the steps down as a checklist without using the word "judgment", a script can do it. Do not automate a one-off task you will never run again, and do not automate steps whose rules you cannot yet state; write the rules first.
+
+## Project setup
+
+```text
+reporting/
+  incoming/            # raw monthly CSVs land here
+  report.py            # the script
+  requirements.txt     # pandas, openpyxl
+```
+
+Create an isolated environment and install the two libraries. `pandas` does the data work and `openpyxl` lets it write `.xlsx` files:
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate        # macOS/Linux: source .venv/bin/activate
+pip install pandas openpyxl
+```
+
+## Step 1: Load every file the same way
+
+```python
+from pathlib import Path
+import pandas as pd
+
+INCOMING = Path("incoming")
+OUTPUT = Path("monthly_summary.xlsx")
+
+
+def load(path: Path) -> pd.DataFrame:
+    df = pd.read_csv(path, dtype=str, encoding="utf-8-sig")
+    df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
+    df["source_file"] = path.name
+    return df
+```
+
+Three choices here prevent common failures:
+
+- **`dtype=str`** reads every column as text. Pandas otherwise guesses types, and a single stray value turns a numeric column into text (or silently converts IDs like `007` into `7`). Convert deliberately later.
+- **`encoding="utf-8-sig"`** handles the invisible byte-order mark that Excel adds to CSV files, which would otherwise glue itself to the first column name.
+- **Normalized column names** (`"Order ID"` becomes `order_id`) make the rest of the code immune to capitalization and stray spaces in headers.
+
+Keeping `source_file` lets you trace any suspicious row back to the file it came from.
+
+## Step 2: Clean the data with explicit rules
+
+```python
+def clean(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+    df["customer"] = df["customer"].str.strip().str.title()
+    df["region"] = df["region"].str.strip().str.title().replace("", pd.NA).fillna("Unknown")
+    df["order_date"] = pd.to_datetime(df["order_date"], errors="coerce")
+    # "₹ 850" and "2,400" -> 850 and 2400; blanks become NaN
+    df["amount"] = pd.to_numeric(
+        df["amount"].str.replace(r"[^\d.]", "", regex=True), errors="coerce"
+    )
+    before = len(df)
+    df = df.drop_duplicates(subset="order_id", keep="first")
+    df = df.dropna(subset=["order_date", "amount"])
+    print(f"kept {len(df)} of {before} rows")
+    return df
+```
+
+Each line encodes a rule someone would otherwise apply by hand:
+
+- `strip().str.title()` makes `"  Acme "` and `"acme"` the same customer. Without it, a pivot treats them as different groups.
+- `errors="coerce"` turns unparseable dates and amounts into `NaT`/`NaN` instead of crashing, and the following `dropna` removes them. Use `coerce` only when you also report how many rows were dropped, which is what the `print` does. Silent data loss is worse than a crash.
+- Stripping every non-digit character from `amount` handles currency symbols and thousands separators in one pass. If your data can contain negative numbers, allow a leading minus sign in the pattern.
+- `drop_duplicates(subset="order_id")` keeps the first occurrence of each ID. Decide which duplicate should win (first, last, or the most recent) based on your business rule.
+
+On the sample data, this step reported `kept 46 of 62 rows`. Always inspect the dropped rows at least once when you first build a script. Writing them to a separate "rejects" sheet is a good habit, because it turns silent filtering into something reviewable.
+
+## Step 3: Summarize
+
+```python
+orders = clean(pd.concat((load(f) for f in sorted(INCOMING.glob("orders_*.csv"))),
+                         ignore_index=True))
+
+by_region = orders.pivot_table(
+    index="region",
+    columns=orders["order_date"].dt.to_period("M").astype(str),
+    values="amount", aggfunc="sum", fill_value=0,
+)
+top_customers = (
+    orders.groupby("customer")["amount"].agg(["count", "sum"])
+    .sort_values("sum", ascending=False).head(10)
+)
+```
+
+`pivot_table` gives revenue by region and month, and `groupby` with `agg` gives order count and revenue per customer. Output from the sample run:
+
+```text
+    region  2026-01  2026-02
+0     East   3560.5  11692.0
+1  Unknown  13742.0   2710.5
+2     West   9171.0  11342.0
+```
+
+The `Unknown` row is the script doing its job: blank regions were labeled rather than dropped, so the totals still reconcile and the data-quality problem is visible.
+
+## Step 4: Write the report
+
+```python
+with pd.ExcelWriter(OUTPUT, engine="openpyxl") as writer:
+    orders.to_excel(writer, sheet_name="clean_orders", index=False)
+    by_region.to_excel(writer, sheet_name="by_region")
+    top_customers.to_excel(writer, sheet_name="top_customers")
+```
+
+Using a single `ExcelWriter` produces one workbook with three sheets. If stakeholders want formatting (column widths, number formats), `openpyxl` can adjust the sheets after writing; keep presentation code separate from the cleaning logic so each stays readable.
+
+## Make it safe to run unattended
+
+A script that runs on a schedule should fail loudly and predictably:
+
+- **Fail on empty input.** If the glob matches nothing, stop with a clear message (`raise SystemExit("No input files found")`) instead of producing an empty report that looks valid.
+- **Check expected columns.** Compare `set(df.columns)` with the set you need and raise an error naming the missing ones.
+- **Log counts, not just success.** Rows read, rows dropped and output path make a run auditable.
+- **Never overwrite your only copy.** Write to a new file name that includes the date, or keep the raw `incoming/` files untouched, as this script does.
+- **Keep secrets out of the code.** If the script ever needs credentials, read them from environment variables.
+
+## Scheduling
+
+Once the script works by hand, run it automatically. On Windows use Task Scheduler with the program set to your virtual environment's `python.exe`, the argument set to the script path and the start-in folder set to the project directory (relative paths such as `incoming/` depend on it). On Linux and macOS, use `cron` with the same absolute paths. For anything with dependencies between steps, retries or alerts, move to an orchestrator later; do not start there.
+
+## Where this leads
+
+The same load, clean, summarize, export structure scales from small reporting chores to real analysis. The [Ahmedabad RERA analytics project](/projects/ahmedabad-rera-data-analytics/) applies the same kinds of cleaning rules (standardized dates and cost fields, completeness checks) to 5,478 government filings, using Excel, and the [SaaS incident analytics project](/projects/saas-reliability-incident-intelligence/) validates a dataset in Python before running SQL over it. If your source data lives in a database rather than files, tuning the query first pays off, as covered in [SQL query optimization](/blog/sql-query-optimization-techniques/).

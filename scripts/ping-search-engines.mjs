@@ -9,12 +9,19 @@ const urls = [
   `${BASE_URL}/blog/`,
   `${BASE_URL}/ai-lab/`,
   `${BASE_URL}/resume/`,
+  `${BASE_URL}/rera-analytics/`,
+  `${BASE_URL}/incident-analytics/`,
   `${BASE_URL}/projects/ahmedabad-rera-data-analytics/`,
   `${BASE_URL}/projects/saas-reliability-incident-intelligence/`,
   `${BASE_URL}/projects/white-label-assessment-platform/`,
   `${BASE_URL}/projects/incident-management-platform/`,
   `${BASE_URL}/projects/payment-gateway/`,
   `${BASE_URL}/blog/building-saas-dotnet/`,
+  `${BASE_URL}/blog/clean-maintainable-aspnet-core-web-api/`,
+  `${BASE_URL}/blog/sql-query-optimization-techniques/`,
+  `${BASE_URL}/blog/practical-python-automation-pandas/`,
+  `${BASE_URL}/blog/deploying-applications-on-azure-guide/`,
+  `${BASE_URL}/blog/how-ai-is-changing-dotnet-development/`,
 ];
 
 async function submitIndexNow() {

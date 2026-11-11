@@ -1,0 +1,159 @@
+---
+title: "Deploying and Managing Applications on Microsoft Azure: A Practical Developer Guide"
+seoTitle: "Deploy and Manage Apps on Azure: Developer Guide"
+description: "Run an ASP.NET Core app on Azure: App Service, Azure SQL, Blob Storage, secrets, a GitHub Actions deploy workflow, monitoring and troubleshooting steps."
+date: "2026-11-11"
+modified: "2026-11-11"
+tags: ["Azure", "App Service", "Azure SQL", "Deployment", "DevOps"]
+category: "Cloud"
+published: true
+relatedProjects: ["incident-management-platform", "payment-gateway"]
+relatedPosts: ["clean-maintainable-aspnet-core-web-api", "sql-query-optimization-techniques"]
+references:
+  - title: "Azure App Service documentation (Microsoft Learn)"
+    url: "https://learn.microsoft.com/azure/app-service/"
+  - title: "Configure an App Service app: app settings and connection strings (Microsoft Learn)"
+    url: "https://learn.microsoft.com/azure/app-service/configure-common"
+  - title: "Use Key Vault references for App Service (Microsoft Learn)"
+    url: "https://learn.microsoft.com/azure/app-service/app-service-key-vault-references"
+  - title: "Azure SQL Database documentation (Microsoft Learn)"
+    url: "https://learn.microsoft.com/azure/azure-sql/database/"
+  - title: "Deploy to App Service using GitHub Actions (Microsoft Learn)"
+    url: "https://learn.microsoft.com/azure/app-service/deploy-github-actions"
+  - title: "Application Insights overview (Microsoft Learn)"
+    url: "https://learn.microsoft.com/azure/azure-monitor/app/app-insights-overview"
+---
+
+Azure has hundreds of services, but a typical web application needs only a handful: somewhere to run the code, a database, file storage, configuration and secrets, a way to deploy, and a way to see what is going on. This guide walks through that path for an ASP.NET Core API using Azure CLI commands, then covers the troubleshooting steps that solve most "it works locally" problems.
+
+Commands use the Azure CLI (`az`). Names such as `rg-demo` and `demo-api-123` are placeholders; App Service and SQL server names must be globally unique. Check current options in the linked documentation, since Azure CLI parameters and runtime names evolve.
+
+## The mental model
+
+- A **resource group** is a folder for everything that belongs to one application and its environment. Deleting it deletes everything inside, which makes cleanup of test environments easy.
+- An **App Service plan** is the compute you pay for (size and region). One or more **web apps** run on a plan.
+- **Azure SQL** is a managed SQL Server database. **Storage accounts** hold blobs, files and queues.
+- **Managed identity** lets your app authenticate to other Azure services without a password in config.
+
+## Step 1: Create the resource group and the web app
+
+```bash
+az login
+az group create --name rg-demo --location centralindia
+
+az appservice plan create --name plan-demo --resource-group rg-demo \
+  --sku B1 --is-linux
+
+az webapp create --name demo-api-123 --resource-group rg-demo \
+  --plan plan-demo --runtime "DOTNETCORE:8.0"
+```
+
+Pick the region nearest your users and keep the app, database and storage in the same region to avoid latency and cross-region data charges. A Basic (B1) plan is a reasonable starting point for learning and small internal tools; production workloads usually need a plan with scaling, deployment slots and more memory. Choose the runtime that matches your project's target framework, because a mismatch is one of the most common causes of startup failure.
+
+## Step 2: Create the database
+
+```bash
+az sql server create --name sql-demo-123 --resource-group rg-demo \
+  --location centralindia --admin-user sqladmin --admin-password "<strong-password>"
+
+az sql db create --resource-group rg-demo --server sql-demo-123 \
+  --name appdb --service-objective Basic
+
+# Let Azure-hosted services reach the server (adds the 0.0.0.0 rule)
+az sql server firewall-rule create --resource-group rg-demo --server sql-demo-123 \
+  --name AllowAzureServices --start-ip-address 0.0.0.0 --end-ip-address 0.0.0.0
+
+# Let your own machine run migrations
+az sql server firewall-rule create --resource-group rg-demo --server sql-demo-123 \
+  --name MyIp --start-ip-address <your-ip> --end-ip-address <your-ip>
+```
+
+Azure SQL blocks all connections until a firewall rule allows them. "Cannot open server ... requested by the login. Client with IP address ... is not allowed" always means a missing rule. For production, prefer private endpoints and Microsoft Entra authentication over a shared admin password. Apply schema changes with EF Core migrations or a migration tool in your pipeline, not by hand in the portal.
+
+## Step 3: Configuration and secrets
+
+App Service **application settings** are injected as environment variables and override `appsettings.json`. ASP.NET Core maps a double underscore to a nested key, so the setting `ConnectionStrings__Default` replaces `ConnectionStrings:Default`:
+
+```bash
+az webapp config appsettings set --name demo-api-123 --resource-group rg-demo \
+  --settings ASPNETCORE_ENVIRONMENT=Production \
+             "ConnectionStrings__Default=Server=tcp:sql-demo-123.database.windows.net,1433;Database=appdb;User ID=sqladmin;Password=<strong-password>;Encrypt=True;"
+```
+
+Rules that save pain later:
+
+- Keep secrets out of source control and `appsettings.json`. Use app settings at minimum, and **Key Vault references** for real secrets, written as `@Microsoft.KeyVault(SecretUri=https://<vault>.vault.azure.net/secrets/<name>/)`.
+- Give the app a **managed identity** (`az webapp identity assign`) and grant it access to Key Vault, Storage or SQL so no credential needs to exist at all.
+- Use one set of settings per environment. Deployment slots let you stage a release with its own settings before swapping it live.
+
+## Step 4: Storage
+
+For user uploads, generated reports and other files, create a storage account and a private container:
+
+```bash
+az storage account create --name stdemo123 --resource-group rg-demo \
+  --location centralindia --sku Standard_LRS --allow-blob-public-access false
+az storage container create --account-name stdemo123 --name uploads --auth-mode login
+```
+
+Disable public blob access unless you truly serve public files. From code, authenticate with `DefaultAzureCredential` (the app's managed identity in Azure, your developer sign-in locally) and grant the identity the *Storage Blob Data Contributor* role instead of distributing account keys.
+
+## Step 5: A repeatable deployment workflow
+
+Manual publishing from an IDE is fine for a first deployment, but a pipeline makes releases repeatable. A GitHub Actions workflow that builds, tests and deploys on every push to `main` looks like this:
+
+```yaml
+name: Deploy API
+on:
+  push:
+    branches: [main]
+
+permissions:
+  id-token: write   # for OIDC login to Azure
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - run: dotnet test --configuration Release
+      - run: dotnet publish src/Api -c Release -o ./publish
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - uses: azure/webapps-deploy@v3
+        with:
+          app-name: demo-api-123
+          package: ./publish
+```
+
+Signing in with OpenID Connect (federated credentials) avoids storing a long-lived Azure password or publish profile in GitHub secrets. Run tests before the deploy step so a failing build never reaches production. Pin action versions as above and review them occasionally.
+
+## Step 6: Monitoring and troubleshooting
+
+Turn on **Application Insights** for the web app. It collects request rates, failures, dependency calls (SQL, HTTP) and exceptions, and lets you query them with Kusto (KQL) in Log Analytics. Also add a lightweight `/health` endpoint so App Service health checks and your own monitors can detect an unhealthy instance.
+
+When something fails after deployment, work from the outside in:
+
+1. **Is the app starting?** Stream the logs: `az webapp log tail --name demo-api-123 --resource-group rg-demo` (enable application logging first). A startup crash usually shows an exception immediately.
+2. **HTTP 500.30 / app fails to start**: wrong runtime stack, missing or misnamed app setting, or an exception in `Program.cs` such as a failed configuration read.
+3. **HTTP 502/503 right after deployment**: the app is still starting, crashing in a loop, or out of memory on a small plan. Check the log stream and the plan's metrics.
+4. **Database errors**: confirm the firewall rule, the connection string (`Encrypt=True`, correct server name, correct `__` setting key) and that migrations ran.
+5. **Works locally, fails in Azure**: compare environment. Production reads app settings, uses Linux file paths with case-sensitive names, and does not have your user secrets or local files.
+6. **Slow, not failing**: open Application Insights and look at the slowest dependencies. A slow SQL call usually points to a query problem; see [SQL query optimization](/blog/sql-query-optimization-techniques/).
+
+## Cost and cleanup habits
+
+Tag resources with the project and owner, stop or delete test environments, and set a budget alert in Cost Management so a forgotten resource does not surprise you at month end. Delete a whole experiment with one command:
+
+```bash
+az group delete --name rg-demo --yes --no-wait
+```
+
+For how to structure the API you are deploying, see the [ASP.NET Core architecture guide](/blog/clean-maintainable-aspnet-core-web-api/). Azure SQL and Blob Storage are part of the stack described in the [incident management platform](/projects/incident-management-platform/) case study.
