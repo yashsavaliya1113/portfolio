@@ -10,6 +10,7 @@ const urls = [
   `${BASE_URL}/ai-lab/`,
   `${BASE_URL}/resume/`,
   `${BASE_URL}/projects/ahmedabad-rera-data-analytics/`,
+  `${BASE_URL}/projects/saas-reliability-incident-intelligence/`,
   `${BASE_URL}/projects/white-label-assessment-platform/`,
   `${BASE_URL}/projects/incident-management-platform/`,
   `${BASE_URL}/projects/payment-gateway/`,
