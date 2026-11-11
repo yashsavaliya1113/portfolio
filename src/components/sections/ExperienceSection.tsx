@@ -1,5 +1,3 @@
-"use client";
-
 import { SectionHeading } from "@/components/SectionHeading";
 import { ExperienceCard } from "@/components/ExperienceCard";
 import { experiences } from "@/config/experience";

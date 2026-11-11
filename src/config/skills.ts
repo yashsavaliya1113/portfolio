@@ -14,6 +14,7 @@ export const skillCategories: SkillCategory[] = [
       { name: "KPI Dashboarding & Visualization" },
       { name: "SQL & Complex Aggregations" },
       { name: "Python for Data (Pandas)" },
+      { name: "Power BI" },
     ],
   },
   {
@@ -28,8 +29,6 @@ export const skillCategories: SkillCategory[] = [
       { name: "Blazor" },
       { name: "ASP.NET Aspire" },
       { name: "GraphQL" },
-      { name: "CQRS / MediatR" },
-      { name: "Clean Architecture" },
     ],
   },
   {
@@ -69,7 +68,6 @@ export const skillCategories: SkillCategory[] = [
       { name: "CI/CD" },
       { name: "OpenTelemetry" },
       { name: "IIS" },
-      { name: "Git" },
     ],
   },
   {

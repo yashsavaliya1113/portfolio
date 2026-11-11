@@ -4,8 +4,10 @@ import { ArrowUpRight, Calendar, CheckCircle2 } from "lucide-react";
 import { GitHubIcon } from "@/components/GitHubIcon";
 import Link from "next/link";
 import { MetricCard } from "@/components/MetricCard";
-import { ProjectDetailClient } from "./ProjectDetailClient";
-import { siteConfig } from "@/config/site";
+import { JsonLd } from "@/components/JsonLd";
+import { getAllPosts } from "@/lib/blog";
+import { profile } from "@/config/profile";
+import { absoluteUrl, breadcrumbJsonLd, pageMetadata, personId } from "@/lib/seo";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -19,26 +21,12 @@ export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const project = projects.find((p) => p.slug === slug);
   if (!project) return {};
-  return {
-    title: project.title,
+  return pageMetadata({
+    title: project.seoTitle ?? project.title,
     description: project.description,
-    openGraph: {
-      title: `${project.title} — Projects`,
-      description: project.description,
-      url: `${siteConfig.url}/projects/${slug}`,
-      images: [{ url: `${siteConfig.url}/og.png`, width: 1200, height: 630, alt: project.title }],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: `${project.title} — Projects`,
-      description: project.description,
-      images: [`${siteConfig.url}/og.png`],
-    },
-    alternates: {
-      canonical: `${siteConfig.url}/projects/${slug}`,
-    },
-    keywords: [...project.technologies, ...project.categories, "portfolio", "project"],
-  };
+    path: `/projects/${slug}`,
+    keywords: [...project.technologies, ...project.categories],
+  });
 }
 
 export default async function ProjectPage({ params }: Props) {
@@ -46,24 +34,32 @@ export default async function ProjectPage({ params }: Props) {
   const project = projects.find((p) => p.slug === slug);
   if (!project) notFound();
 
+  const url = absoluteUrl(`/projects/${slug}`);
+  // SoftwareSourceCode only when public code exists; otherwise a plain CreativeWork. No invented dates or ratings.
   const projectJsonLd = {
     "@context": "https://schema.org",
-    "@type": "SoftwareSourceCode",
+    "@type": project.links.github ? "SoftwareSourceCode" : "CreativeWork",
+    "@id": `${url}#project`,
     name: project.title,
     description: project.description,
-    author: { "@type": "Person", name: "Yash Savaliya" },
-    programmingLanguage: project.technologies.filter((t) =>
-      ["C#", "TypeScript", "JavaScript", "Python"].includes(t),
-    ),
-    runtimePlatform: "Web",
-    dateCreated: project.timeline,
+    url,
+    keywords: project.technologies.join(", "),
+    author: { "@type": "Person", "@id": personId, name: profile.name },
+    ...(project.links.github ? { codeRepository: project.links.github } : {}),
   };
+  const articles = getAllPosts().filter((p) => p.relatedProjects.includes(slug));
 
   return (
     <div className="pt-24 pb-20">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(projectJsonLd) }}
+      <JsonLd
+        data={[
+          projectJsonLd,
+          breadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "Projects", path: "/#projects" },
+            { name: project.title, path: `/projects/${slug}` },
+          ]),
+        ]}
       />
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
         <Link
@@ -151,8 +147,6 @@ export default async function ProjectPage({ params }: Props) {
           </div>
         </header>
 
-        <ProjectDetailClient project={project} />
-
         {project.metrics.length > 0 && (
           <section className="mb-12">
             <h2 className="mb-6 font-heading text-2xl font-bold">Metrics</h2>
@@ -239,6 +233,21 @@ export default async function ProjectPage({ params }: Props) {
             ))}
           </ul>
         </section>
+
+        {articles.length > 0 && (
+          <section className="mb-12 border-t border-[var(--color-border)] pt-8">
+            <h2 className="mb-4 font-heading text-2xl font-bold">Related articles</h2>
+            <ul className="space-y-2 text-sm">
+              {articles.map((a) => (
+                <li key={a.slug}>
+                  <Link href={`/blog/${a.slug}/`} className="font-medium text-primary hover:underline">
+                    {a.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
       </div>
     </div>
   );

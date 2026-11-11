@@ -1,240 +1,162 @@
+// Post-build audit of the static export in out/. Fails the build (exit 1) on any problem.
+// Checks SEO metadata, structured data, sitemap/robots, internal links and anchors, and a few performance guards.
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const rootDir = path.join(__dirname, "..");
-const outDir = path.join(rootDir, "out");
+const outDir = path.join(__dirname, "..", "out");
+const SITE = (process.env.NEXT_PUBLIC_SITE_URL || "https://yashsavaliya1113.github.io/portfolio").replace(/\/$/, "");
+const BASE = new URL(SITE).pathname.replace(/\/$/, ""); // "/portfolio"
 
-const results = {
-  seo: { passed: 0, total: 0, items: [] },
-  geo: { passed: 0, total: 0, items: [] },
-  performance: { passed: 0, total: 0, items: [] },
-};
-
-function record(category, testName, passed, details = "") {
+const results = {};
+function record(category, name, passed, details = "") {
+  (results[category] ??= { passed: 0, total: 0, items: [] });
   results[category].total++;
-  if (passed) {
-    results[category].passed++;
-    results[category].items.push({ name: testName, status: "PASS", details });
-  } else {
-    results[category].items.push({ name: testName, status: "FAIL", details });
-  }
+  if (passed) results[category].passed++;
+  results[category].items.push({ name, status: passed ? "PASS" : "FAIL", details });
 }
 
-// 1. Audit HTML files
-const htmlFiles = [
-  "index.html",
-  "ai-lab/index.html",
-  "blog/index.html",
-  "blog/building-saas-dotnet/index.html",
-  "projects/ahmedabad-rera-data-analytics/index.html",
-  "projects/saas-reliability-incident-intelligence/index.html",
-  "projects/white-label-assessment-platform/index.html",
-  "projects/incident-management-platform/index.html",
-  "projects/payment-gateway/index.html",
-  "resume/index.html",
-];
-
-for (const relPath of htmlFiles) {
-  const fullPath = path.join(outDir, relPath);
-  if (!fs.existsSync(fullPath)) {
-    record("seo", `HTML Page Exists: ${relPath}`, false, "File missing in out/");
-    continue;
-  }
-
-  const content = fs.readFileSync(fullPath, "utf8");
-
-  // Title check
-  const titleMatch = content.match(/<title[^>]*>([^<]+)<\/title>/i);
-  const hasTitle = !!titleMatch && titleMatch[1].trim().length > 5;
-  record("seo", `Title Tag: ${relPath}`, hasTitle, hasTitle ? titleMatch[1] : "Missing or too short");
-
-  // Meta description
-  const descMatch = content.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i);
-  const hasDesc = !!descMatch && descMatch[1].trim().length > 20;
-  record("seo", `Meta Description: ${relPath}`, hasDesc, hasDesc ? `${descMatch[1].slice(0, 50)}...` : "Missing or too short");
-
-  // Canonical tag
-  const canMatch = content.match(/<link[^>]*rel=["']canonical["'][^>]*href=["']([^"']+)["']/i);
-  const hasCanonical = !!canMatch && (canMatch[1].includes("yashsavaliya.dev") || canMatch[1].includes("yashsavaliya1113.github.io/portfolio"));
-  record("seo", `Canonical Tag: ${relPath}`, hasCanonical, hasCanonical ? canMatch[1] : "Missing or invalid domain");
-
-  // OpenGraph title & image
-  const ogTitle = content.match(/<meta[^>]*property=["']og:title["']/i);
-  const ogImage = content.match(/<meta[^>]*property=["']og:image["']/i);
-  record("seo", `OpenGraph Tags: ${relPath}`, !!(ogTitle && ogImage), ogTitle && ogImage ? "Present" : "Missing OG tags");
-
-  // Twitter cards
-  const twCard = content.match(/<meta[^>]*name=["']twitter:card["']/i);
-  record("seo", `Twitter Card: ${relPath}`, !!twCard, twCard ? "Present" : "Missing twitter:card");
-
-  // Heading check: exactly 1 h1
-  const h1Matches = content.match(/<h1[^>]*>/gi) || [];
-  const singleH1 = h1Matches.length === 1;
-  record("seo", `Single H1 Heading: ${relPath}`, singleH1, `Count: ${h1Matches.length}`);
-
-  // Image alt tags
-  const imgMatches = content.match(/<img[^>]*>/gi) || [];
-  const allImagesHaveAlt = imgMatches.every((img) => /alt=["'][^"']+["']/i.test(img));
-  record("seo", `Images Have Alt Text: ${relPath}`, allImagesHaveAlt, `Checked ${imgMatches.length} images`);
-
-  // HTML lang
-  const hasLang = /<html[^>]*lang=["']en["']/i.test(content);
-  record("seo", `HTML lang Attribute: ${relPath}`, hasLang, hasLang ? "lang=en" : "Missing");
-
-  // Viewport
-  const hasViewport = /<meta[^>]*name=["']viewport["']/i.test(content);
-  record("seo", `Viewport Meta: ${relPath}`, hasViewport, hasViewport ? "Present" : "Missing");
-
-  // JSON-LD structured data
-  const hasJsonLd = /<script[^>]*type=["']application\/ld\+json["']/i.test(content);
-  record("seo", `JSON-LD Structured Data: ${relPath}`, hasJsonLd, hasJsonLd ? "Present" : "Missing");
-}
-
-// 2. Audit Sitemap & RSS
+// ---- Collect every page from the sitemap (single source of truth) -----------
 const sitemapPath = path.join(outDir, "sitemap.xml");
-const hasSitemap = fs.existsSync(sitemapPath);
-if (hasSitemap) {
-  const sitemapContent = fs.readFileSync(sitemapPath, "utf8");
-  const isXml = sitemapContent.includes('<?xml version="1.0"') && sitemapContent.includes("</urlset>");
-  const hasAllPages = [
-    "/",
-    "/blog",
-    "/ai-lab",
-    "/resume",
-    "/projects/ahmedabad-rera-data-analytics",
-    "/projects/saas-reliability-incident-intelligence",
-    "/projects/white-label-assessment-platform",
-    "/projects/incident-management-platform",
-    "/projects/payment-gateway",
-    "/blog/building-saas-dotnet",
-  ].every(
-    (p) =>
-      sitemapContent.includes(`${p}</loc>`) ||
-      sitemapContent.includes(`${p}/</loc>`)
-  );
-  record("seo", "Sitemap.xml Valid Structure & All Routes", isXml && hasAllPages, "All 9 routes indexed");
-} else {
-  record("seo", "Sitemap.xml Valid Structure & All Routes", false, "Missing sitemap.xml");
-}
+const sitemap = fs.existsSync(sitemapPath) ? fs.readFileSync(sitemapPath, "utf8") : "";
+const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+record("sitemap", "sitemap.xml exists and is well-formed", sitemap.includes("<urlset") && sitemap.includes("</urlset>") && locs.length > 0, `${locs.length} URLs`);
+record("sitemap", "All sitemap URLs use the site origin and a trailing slash", locs.every((l) => l.startsWith(SITE) && l.endsWith("/")));
+record("sitemap", "No duplicate sitemap URLs", new Set(locs).size === locs.length);
 
-const rssPath = path.join(outDir, "rss.xml");
-const hasRss = fs.existsSync(rssPath);
-if (hasRss) {
-  const rssContent = fs.readFileSync(rssPath, "utf8");
-  const isRssValid = rssContent.includes("<rss version=\"2.0\"") && rssContent.includes("</channel>");
-  record("seo", "RSS 2.0 Feed Valid Structure", isRssValid, "Valid RSS XML");
-} else {
-  record("seo", "RSS 2.0 Feed Valid Structure", false, "Missing rss.xml");
-}
-
-// 3. GEO Audits (Generative Engine Optimization & Geographic SEO)
-// a) llms.txt & llms-full.txt
-const llmsPath = path.join(outDir, "llms.txt");
-const hasLlms = fs.existsSync(llmsPath) && fs.statSync(llmsPath).size > 1000;
-record("geo", "LLMs.txt (llmstxt.org standard)", hasLlms, hasLlms ? `${fs.statSync(llmsPath).size} bytes` : "Missing or small");
-
-const llmsFullPath = path.join(outDir, "llms-full.txt");
-const hasLlmsFull = fs.existsSync(llmsFullPath) && fs.statSync(llmsFullPath).size > 3000;
-record("geo", "LLMs-Full.txt (comprehensive AI dossier)", hasLlmsFull, hasLlmsFull ? `${fs.statSync(llmsFullPath).size} bytes` : "Missing or small");
-
-const llmPath = path.join(outDir, "llm.txt");
-const hasLlm = fs.existsSync(llmPath) && fs.statSync(llmPath).size > 1000;
-record("geo", "LLM.txt (backwards compatibility)", hasLlm, hasLlm ? `${fs.statSync(llmPath).size} bytes` : "Missing or small");
-
-// b) AI Crawlers in robots.txt
-const robotsPath = path.join(outDir, "robots.txt");
-if (fs.existsSync(robotsPath)) {
-  const robots = fs.readFileSync(robotsPath, "utf8");
-  const aiBots = ["GPTBot", "ChatGPT-User", "PerplexityBot", "ClaudeBot", "Google-Extended", "Applebot-Extended"];
-  const hasAiBots = aiBots.every((bot) => robots.includes(`User-agent: ${bot}`));
-  record("geo", "AI Crawlers Authorized in robots.txt", hasAiBots, "GPTBot, PerplexityBot, ClaudeBot, etc.");
-  record("geo", "Sitemap Directive in robots.txt", robots.includes("sitemap.xml"), "Present");
-} else {
-  record("geo", "AI Crawlers Authorized in robots.txt", false, "robots.txt missing");
-  record("geo", "Sitemap Directive in robots.txt", false, "robots.txt missing");
-}
-
-// c) Geographic SEO Tags in index.html
-const indexContent = fs.readFileSync(path.join(outDir, "index.html"), "utf8");
-const hasGeoRegion = indexContent.includes('name="geo.region" content="IN-GJ"');
-const hasGeoPlace = indexContent.includes('name="geo.placename" content="Ahmedabad, Gujarat, India"');
-const hasGeoPos = indexContent.includes('name="geo.position" content="23.0225;72.5714"');
-const hasIcbm = indexContent.includes('name="ICBM" content="23.0225, 72.5714"');
-record("geo", "Geographic Region Meta (geo.region)", hasGeoRegion, "IN-GJ");
-record("geo", "Geographic Placename Meta (geo.placename)", hasGeoPlace, "Ahmedabad, Gujarat, India");
-record("geo", "Geographic Coordinates Meta (geo.position & ICBM)", hasGeoPos && hasIcbm, "23.0225, 72.5714");
-
-// d) Schema.org Geo & ProfilePage
-const hasProfilePageSchema = indexContent.includes('"@type":"ProfilePage"');
-const hasGeoSchema = indexContent.includes('"@type":"GeoCoordinates"') && indexContent.includes('"latitude":23.0225');
-const hasOccupationSchema = indexContent.includes('"@type":"Occupation"') && indexContent.includes("Full Stack .NET Developer");
-const hasPostalAddress = indexContent.includes('"@type":"PostalAddress"') && indexContent.includes("Ahmedabad");
-const hasKnowsAbout = indexContent.includes('"knowsAbout"');
-
-record("geo", "Schema.org ProfilePage Graph", hasProfilePageSchema, "Present");
-record("geo", "Schema.org GeoCoordinates & PostalAddress", hasGeoSchema && hasPostalAddress, "Present");
-record("geo", "Schema.org Occupation & Technical Competencies", hasOccupationSchema && hasKnowsAbout, "Present");
-
-// 4. Performance Audits
-// a) No layout shift spinner
-const hasNoSpinner = !indexContent.includes("animate-spin");
-record("performance", "Zero Cumulative Layout Shift (No Root Spinner Delay)", hasNoSpinner, hasNoSpinner ? "Inlined static content" : "Delayed by spinner");
-
-// b) Optimized Favicons and App Icons
-const iconSizes = {
-  "favicon.png": fs.existsSync(path.join(outDir, "favicon.png")) ? fs.statSync(path.join(outDir, "favicon.png")).size : 999999,
-  "apple-touch-icon.png": fs.existsSync(path.join(outDir, "apple-touch-icon.png")) ? fs.statSync(path.join(outDir, "apple-touch-icon.png")).size : 999999,
-  "icon.svg": fs.existsSync(path.join(outDir, "icon.svg")) ? fs.statSync(path.join(outDir, "icon.svg")).size : 999999,
+const fileFor = (url) => {
+  const rel = url.slice(SITE.length).replace(/^\//, "");
+  return path.join(outDir, rel, "index.html");
 };
-const iconsLightweight = iconSizes["favicon.png"] < 10000 && iconSizes["apple-touch-icon.png"] < 30000;
-record("performance", "Lightweight Optimized Favicons (<30KB)", iconsLightweight, `Favicon: ${iconSizes["favicon.png"]}B, AppleIcon: ${iconSizes["apple-touch-icon.png"]}B`);
 
-// c) Avatar WebP support
-const hasAvatarWebp = fs.existsSync(path.join(outDir, "avatar.webp")) && indexContent.includes("avatar.webp");
-record("performance", "Next-Gen WebP Avatar & Explicit Image Dimensions", hasAvatarWebp, hasAvatarWebp ? "WebP + 400x400 explicit dimensions" : "Missing WebP");
+const seenTitles = new Map();
+const seenDescs = new Map();
+const pages = new Map(); // url -> html
 
-// d) Critical CSS inlined / bundle small
-const cssFiles = fs.readdirSync(path.join(outDir, "_next", "static", "css"));
-const totalCssSize = cssFiles.reduce((acc, f) => acc + fs.statSync(path.join(outDir, "_next", "static", "css", f)).size, 0);
-const cssSmall = totalCssSize < 65000; // < 65KB uncompressed (<10KB gzip)
-record("performance", "Minified CSS Bundle (<65KB uncompressed, <10KB gzip)", cssSmall, `Total CSS: ${(totalCssSize / 1024).toFixed(1)} KB`);
+for (const loc of locs) {
+  const file = fileFor(loc);
+  const exists = fs.existsSync(file);
+  record("pages", `Page exists: ${loc}`, exists);
+  if (!exists) continue;
+  const html = fs.readFileSync(file, "utf8");
+  pages.set(loc, html);
 
-// e) Skip link for keyboard/screen readers
-const hasSkipLink = indexContent.includes("Skip to main content");
-record("performance", "Accessibility: Skip to Main Content Link", hasSkipLink, "Present");
+  const title = html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]?.trim() ?? "";
+  record("seo", `Title 10-70 chars: ${loc}`, title.length >= 10 && title.length <= 70, `"${title}" (${title.length})`);
+  seenTitles.set(title, [...(seenTitles.get(title) ?? []), loc]);
 
-// Print Summary
-console.log("\n=======================================================");
-console.log("       COMPREHENSIVE AUDIT REPORT (SEO, GEO, PERF)     ");
-console.log("=======================================================\n");
+  const desc = html.match(/<meta[^>]*name="description"[^>]*content="([^"]*)"/i)?.[1]?.trim() ?? "";
+  record("seo", `Description 70-170 chars: ${loc}`, desc.length >= 70 && desc.length <= 170, `${desc.length} chars`);
+  seenDescs.set(desc, [...(seenDescs.get(desc) ?? []), loc]);
 
-const categories = ["seo", "geo", "performance"];
-let allHundred = true;
+  const canonicals = [...html.matchAll(/<link[^>]*rel="canonical"[^>]*href="([^"]+)"/gi)].map((m) => m[1]);
+  record("seo", `Exactly one canonical equal to the page URL: ${loc}`, canonicals.length === 1 && canonicals[0] === loc, canonicals.join(" , ") || "missing");
 
-for (const cat of categories) {
-  const score = Math.round((results[cat].passed / results[cat].total) * 100);
-  const color = score === 100 ? "\x1b[32m" : "\x1b[31m";
-  console.log(`${cat.toUpperCase()} SCORE: ${color}${score} / 100\x1b[0m (${results[cat].passed}/${results[cat].total} checks passed)`);
-  if (score !== 100) allHundred = false;
+  const og = ["og:title", "og:description", "og:image", "og:url"].every((p) => new RegExp(`<meta[^>]*property="${p}"`, "i").test(html));
+  const tw = ["twitter:card", "twitter:title", "twitter:image"].every((p) => new RegExp(`<meta[^>]*name="${p}"`, "i").test(html));
+  record("seo", `Open Graph and Twitter tags: ${loc}`, og && tw);
+  const ogUrl = html.match(/<meta[^>]*property="og:url"[^>]*content="([^"]+)"/i)?.[1];
+  record("seo", `og:url equals canonical: ${loc}`, ogUrl === loc, ogUrl ?? "missing");
 
-  for (const item of results[cat].items) {
-    const icon = item.status === "PASS" ? "✓" : "✗";
-    const statusColor = item.status === "PASS" ? "\x1b[32m" : "\x1b[31m";
-    console.log(`  ${statusColor}${icon}\x1b[0m ${item.name} — ${item.details}`);
+  const h1 = (html.match(/<h1[\s>]/gi) || []).length;
+  record("seo", `Exactly one H1: ${loc}`, h1 === 1, `count ${h1}`);
+
+  const imgs = html.match(/<img[^>]*>/gi) || [];
+  record("seo", `All images have alt text: ${loc}`, imgs.every((i) => /\salt="[^"]+"/i.test(i)), `${imgs.length} images`);
+  record("seo", `lang and viewport: ${loc}`, /<html[^>]*lang="en"/i.test(html) && /<meta[^>]*name="viewport"/i.test(html));
+  record("seo", `No obsolete geo/revisit meta tags: ${loc}`, !/name="(geo\.|ICBM|revisit-after|rating)/i.test(html));
+
+  // JSON-LD: every block must parse, and no phone number may be published in structured data.
+  const blocks = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => m[1]);
+  let parsed = [];
+  let ok = blocks.length > 0;
+  for (const b of blocks) {
+    try {
+      const j = JSON.parse(b);
+      parsed.push(...(Array.isArray(j) ? j : [j]));
+    } catch {
+      ok = false;
+    }
   }
-  console.log("");
+  record("schema", `JSON-LD present and valid JSON: ${loc}`, ok, `${parsed.length} objects`);
+  record("schema", `No telephone in structured data: ${loc}`, !blocks.some((b) => /"telephone"/.test(b)));
+  const types = parsed.map((o) => o["@type"]);
+  if (loc.includes("/blog/") && !loc.endsWith("/blog/")) {
+    const post = parsed.find((o) => o["@type"] === "BlogPosting");
+    record("schema", `BlogPosting complete: ${loc}`, !!post && !!post.headline && !!post.datePublished && !!post.dateModified && post.author?.name === "Yash Savaliya", types.join(","));
+    record("schema", `Breadcrumb present: ${loc}`, types.includes("BreadcrumbList"));
+    record("blog", `Table of contents and author box: ${loc}`, html.includes("In this article") && html.includes("About the author"));
+  }
+  if (loc === `${SITE}/`) {
+    record("schema", "Home has Person, WebSite, ProfilePage, FAQPage", ["Person", "WebSite", "ProfilePage", "FAQPage"].every((t) => types.includes(t)), types.join(","));
+    const person = parsed.find((o) => o["@type"] === "Person");
+    record("schema", "Person.sameAs lists the verified GitHub profile", person?.sameAs?.includes("https://github.com/yashsavaliya1113"), (person?.sameAs || []).join(" , "));
+  }
 }
+for (const [t, list] of seenTitles) record("seo", `Unique title: "${t.slice(0, 50)}"`, list.length === 1, list.join(" , "));
+for (const [d, list] of seenDescs) record("seo", `Unique description: "${d.slice(0, 40)}..."`, list.length === 1, list.join(" , "));
 
-console.log("=======================================================");
-if (allHundred) {
-  console.log("\x1b[32m>>> ALL CATEGORIES REACHED 100% PERFECT SCORE! <<<\x1b[0m");
-} else {
-  console.log("\x1b[31m>>> SOME CHECKS NEED ATTENTION <<<\x1b[0m");
+// ---- Internal links and anchors ------------------------------------------------
+const idsOf = (html) => new Set([...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));
+const pageCache = new Map();
+const loadPage = (file) => {
+  if (!pageCache.has(file)) pageCache.set(file, fs.existsSync(file) ? fs.readFileSync(file, "utf8") : null);
+  return pageCache.get(file);
+};
+let broken = [];
+let checked = 0;
+for (const [loc, html] of pages) {
+  for (const m of html.matchAll(/<a[^>]*\shref="([^"]+)"/gi)) {
+    let href = m[1].replace(/&amp;/g, "&");
+    if (/^(mailto:|tel:|javascript:)/.test(href)) continue;
+    if (/^https?:\/\//.test(href) && !href.startsWith(SITE)) continue; // external links are not fetched here
+    checked++;
+    let [p, hash] = href.split("#");
+    p = p.startsWith("http") ? p.slice(SITE.length) : p;
+    if (p.startsWith(BASE)) p = p.slice(BASE.length);
+    if (p === "") p = new URL(loc).pathname.slice(BASE.length) || "/";
+    const target = path.join(outDir, p.replace(/^\//, ""), p.endsWith(".pdf") || p.endsWith(".xml") || p.endsWith(".txt") ? "" : "index.html");
+    const content = loadPage(target);
+    if (content === null && !fs.existsSync(target)) {
+      broken.push(`${loc} -> ${href}`);
+      continue;
+    }
+    if (hash && content && !idsOf(content).has(hash)) broken.push(`${loc} -> ${href} (missing #${hash})`);
+  }
 }
-console.log("=======================================================\n");
+record("links", "No broken internal links or anchors", broken.length === 0, broken.length ? broken.slice(0, 8).join(" | ") : `${checked} links checked`);
+console.log(`Internal links checked: ${checked}`);
 
-if (!allHundred) {
-  process.exit(1);
+// ---- Special files -----------------------------------------------------------------
+const robots = fs.existsSync(path.join(outDir, "robots.txt")) ? fs.readFileSync(path.join(outDir, "robots.txt"), "utf8") : "";
+record("robots", "robots.txt allows crawling and lists the sitemap", /User-agent: \*/.test(robots) && !/Disallow: \/\s*$/m.test(robots) && robots.includes(`${SITE}/sitemap.xml`));
+record("robots", "rss.xml is valid", fs.existsSync(path.join(outDir, "rss.xml")) && fs.readFileSync(path.join(outDir, "rss.xml"), "utf8").includes("</channel>"));
+const nf = path.join(outDir, "404.html");
+const nfHtml = fs.existsSync(nf) ? fs.readFileSync(nf, "utf8") : "";
+record("robots", "Custom 404 page exists and is noindex", nfHtml.includes("Page not found") && /noindex/.test(nfHtml));
+record("robots", "llms.txt exists", fs.existsSync(path.join(outDir, "llms.txt")));
+
+// ---- Performance guards ---------------------------------------------------------------
+const cssDir = path.join(outDir, "_next", "static", "css");
+const cssSize = fs.existsSync(cssDir) ? fs.readdirSync(cssDir).reduce((a, f) => a + fs.statSync(path.join(cssDir, f)).size, 0) : 0;
+record("performance", "CSS bundle under 65 KB", cssSize > 0 && cssSize < 65000, `${(cssSize / 1024).toFixed(1)} KB`);
+const home = pages.get(`${SITE}/`) ?? "";
+record("performance", "Home hero has no entrance animation on the H1 (LCP)", !/<h1[^>]*animate-/.test(home));
+record("performance", "Avatar served as WebP with explicit dimensions", home.includes("avatar.webp") && /<img[^>]*width="400"[^>]*height="400"/.test(home));
+record("performance", "Skip link present", home.includes("Skip to main content"));
+
+// ---- Report ---------------------------------------------------------------------------------
+console.log("\n==================== BUILD AUDIT ====================\n");
+let failed = 0;
+for (const [cat, r] of Object.entries(results)) {
+  console.log(`${cat.toUpperCase()}: ${r.passed}/${r.total} passed`);
+  for (const i of r.items) {
+    if (i.status === "FAIL") {
+      failed++;
+      console.log(`  ✗ ${i.name}${i.details ? ` — ${i.details}` : ""}`);
+    }
+  }
 }
+console.log(failed === 0 ? "\nAll checks passed.\n" : `\n${failed} check(s) FAILED.\n`);
+process.exit(failed === 0 ? 0 : 1);

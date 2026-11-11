@@ -6,28 +6,27 @@
 [![React 19](https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS-v4.3-38bdf8?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com/)
-[![Lighthouse 100](https://img.shields.io/badge/Lighthouse-100%2F100-success?style=for-the-badge&logo=googlechrome)](https://developers.google.com/web/tools/lighthouse)
-[![GEO Ready](https://img.shields.io/badge/GEO-LLM_Optimized-purple?style=for-the-badge)](https://llmstxt.org)
 
 <p align="center">
-  A high-performance, modern, and aesthetically crafted personal portfolio engineered for <strong>Yash Savaliya</strong>, Full Stack .NET Developer & AI Engineer. Built with Next.js 15 App Router (Static Export), React 19, TypeScript, and Tailwind CSS v4.
+  A high-performance, modern, and aesthetically crafted personal portfolio engineered for <strong>Yash Savaliya</strong>, Full Stack .NET Developer and Data Analyst. Built with Next.js 15 App Router (Static Export), React 19, TypeScript, and Tailwind CSS v4.
 </p>
 
-[**View Live Portfolio**](https://yashsavaliya1113.github.io/portfolio/) &nbsp;|&nbsp; [**Custom Domain**](https://yashsavaliya.dev) &nbsp;|&nbsp; [**AI Context (llms.txt)**](https://yashsavaliya.dev/llms.txt)
+[**View Live Portfolio**](https://yashsavaliya1113.github.io/portfolio/) &nbsp;|&nbsp; [**llms.txt**](https://yashsavaliya1113.github.io/portfolio/llms.txt)
 
 ---
 
-### Lighthouse & Audit Benchmarks
+### Lighthouse results (measured, local static export)
 
-| Metric / Category | Score | Realized Benchmark |
-| :--- | :---: | :--- |
-| **Performance** | **100 / 100** | FCP: 0.3s &nbsp;•&nbsp; LCP: 0.6s &nbsp;•&nbsp; Speed Index: 0.7s |
-| **Accessibility** | **100 / 100** | WCAG 2.1 AA/AAA compliant contrast ratios & keyboard landmarks |
-| **Best Practices**| **100 / 100** | Zero console errors, modern HTTP standards & secure headers |
-| **SEO** | **100 / 100** | Complete OpenGraph, Twitter Cards, Sitemap, and Schema.org |
-| **GEO (AI Search)**| **100 / 100** | Full `llms.txt` + `llms-full.txt` spec + Geographic coordinates |
-| **Cumulative Layout Shift (CLS)** | **0.000** | Zero layout shifts on initial paint and hydration |
-| **Total Blocking Time (TBT)** | **0 ms** | Zero main-thread blocking scripts |
+Lighthouse 13, default throttling, run against `out/` served under `/portfolio/`. Scores vary a little between runs.
+
+| Page | Mobile (P / A / BP / SEO) | Desktop (P / A / BP / SEO) |
+| :--- | :---: | :---: |
+| Home | 95 / 100 / 100 / 100 | 100 / 100 / 100 / 100 |
+| AI Lab | 94 / 100 / 100 / 100 | 100 / 100 / 100 / 100 |
+| Blog list | 98 / 100 / 100 / 100 | 100 / 100 / 100 / 100 |
+| Blog article | 94 / 100 / 100 / 100 | 100 / 100 / 100 / 100 |
+
+CLS is 0 on all four pages. Mobile LCP is about 2.2 to 2.6 s under simulated slow 4G.
 
 </div>
 
@@ -36,12 +35,10 @@
 ## Highlights & Features
 
 - **Blazing Fast Performance**: Statically exported with Next.js (`output: 'export'`) for instant CDN edge delivery with zero server latency.
-- **Generative Engine Optimization (GEO)**:
-  - Supports the **[llmstxt.org](https://llmstxt.org)** standard with `/llms.txt` and `/llms-full.txt` for AI search crawlers (Perplexity, ChatGPT Search, Claude, Google AI Overviews).
-  - Explicit AI crawler authorizations in `robots.txt` (`GPTBot`, `PerplexityBot`, `ClaudeBot`, `Applebot-Extended`, etc.).
-  - Rich JSON-LD Knowledge Graph schema (`ProfilePage`, `Person`, `Occupation`, `WebSite`, `BreadcrumbList`, `GeoCoordinates`, `PostalAddress`).
-- **Geographic Regional SEO**:
-  - Embedded geo-targeting meta tags (`geo.region`, `geo.placename`, `geo.position`, `ICBM`) and coordinates for local search engine discovery.
+- **Search and AI discoverability (SEO + GEO)**:
+  - One canonical URL per page (trailing slash, matching the real route), unique titles and descriptions, Open Graph and Twitter cards.
+  - JSON-LD: `Person` and `WebSite` site-wide, `ProfilePage` + `FAQPage` on the home page, `BlogPosting`, `Blog`, `CollectionPage`, `BreadcrumbList`, and project `CreativeWork`/`SoftwareSourceCode`. Only facts visible on the site are described, and `sameAs` lists verified profiles only.
+  - Plain-text identity and a visible FAQ, plus a standard `llms.txt` and an open `robots.txt` with the sitemap.
 - **SEO & Social Sharing**:
   - Dynamically generated `sitemap.xml` and `rss.xml` feeds for all static and dynamic project/blog routes.
   - Granular OpenGraph and Twitter card metadata with fallback image assets.
@@ -54,7 +51,7 @@
   - **About**: Professional journey timeline spanning 2020 to 2026.
   - **Skills Matrix**: Categorized technical competencies (.NET, Angular, Azure, Microservices, CQRS, AI).
   - **Projects**: In-depth architecture breakdown, problem statements, API designs, and metrics for enterprise SaaS applications.
-  - **AI Lab**: Explorations into Agentic AI, Semantic Kernel, LangGraph, and RAG systems.
+  - **AI Lab**: Honestly labelled AI experiments (built, learning, planned) with a working in-browser retrieval demo over the blog.
   - **Blog**: Technical articles rendered from Markdown/MDX with estimated reading time and syntax styling.
   - **Resume**: Full digital resume view with direct PDF download integration.
 
@@ -91,12 +88,10 @@ portfolio/
 │   ├── apple-touch-icon.png      # 180x180 iOS touch icon
 │   ├── icon.svg                  # Vector SVG favicon
 │   ├── llms.txt                  # LLM standard directory (llmstxt.org)
-│   ├── llms-full.txt             # Comprehensive technical dossier for LLMs
-│   ├── llm.txt                   # Backwards compatible LLM file
 │   ├── resume.pdf                # Downloadable PDF resume
-│   └── robots.txt                # Robots file with AI engine crawler rules
+│   └── robots.txt                # Allow-all robots file with the sitemap
 ├── scripts/
-│   ├── audit-all.mjs             # Automated 100% SEO, GEO & Performance test suite
+│   ├── audit-all.mjs             # Post-build audit: metadata, JSON-LD, sitemap, links, anchors
 │   ├── generate-seo.mjs          # Sitemap.xml & RSS.xml generation script
 │   ├── optimize-assets.mjs       # Image and icon optimization script
 │   └── test-server.mjs           # Local HTTP test server with Gzip & Cache-Control
@@ -149,8 +144,8 @@ npm run build
 ```
 The production bundle will be generated in the `out/` folder.
 
-### 5. Automated Audit Suite (SEO, GEO & Performance)
-Verify that all SEO, GEO, and Performance checks score 100%:
+### 5. Automated Audit (SEO, structured data, links)
+After a build, check titles, descriptions, canonicals, JSON-LD, the sitemap and every internal link and anchor. The CI deploy fails if any check fails:
 ```bash
 npm run audit
 ```
@@ -170,7 +165,7 @@ The repository includes a GitHub Actions workflow in [`.github/workflows/deploy.
 Every push to the `main` branch automatically:
 1. Installs dependencies (`npm ci`).
 2. Runs the production build (`npm run build`).
-3. Generates SEO sitemaps, RSS feeds, and AI crawler manifests.
+3. Generates the sitemap, RSS feed and `llms.txt`, then runs the audit.
 4. Uploads the `out/` directory as a GitHub Pages artifact.
 5. Deploys the site live to GitHub Pages.
 
@@ -179,12 +174,12 @@ Every push to the `main` branch automatically:
 ## Author & Contact
 
 **Yash Savaliya**  
-*Full Stack .NET Developer & AI Engineer*  
+*Full Stack .NET Developer and Data Analyst*  
 - **Location**: Ahmedabad, Gujarat, India  
 - **Email**: [tpyashsavaliya13092002@gmail.com](mailto:tpyashsavaliya13092002@gmail.com)  
 - **LinkedIn**: [linkedin.com/in/yash-savaliya-70989a1b4](https://www.linkedin.com/in/yash-savaliya-70989a1b4/)  
 - **GitHub**: [github.com/yashsavaliya](https://github.com/yashsavaliya)  
-- **Website**: [https://yashsavaliya.dev](https://yashsavaliya.dev)  
+- **Website**: [https://yashsavaliya1113.github.io/portfolio/](https://yashsavaliya1113.github.io/portfolio/)  
 - **Live Deployment**: [https://yashsavaliya1113.github.io/portfolio/](https://yashsavaliya1113.github.io/portfolio/)
 
 ---

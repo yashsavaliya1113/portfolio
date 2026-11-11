@@ -1,0 +1,190 @@
+---
+title: "SQL Query Optimization: Practical Techniques Every Developer Should Know"
+seoTitle: "SQL Query Optimization: Practical Techniques"
+description: "Find and fix slow SQL Server queries: read execution plans, design covering indexes, write SARGable predicates, pick joins or EXISTS and avoid common mistakes."
+date: "2026-11-11"
+modified: "2026-11-11"
+tags: ["SQL", "SQL Server", "Performance", "Indexing", "Query Optimization"]
+category: "Engineering"
+published: true
+relatedProjects: ["saas-reliability-incident-intelligence", "incident-management-platform"]
+relatedPosts: ["clean-maintainable-aspnet-core-web-api", "practical-python-automation-pandas"]
+references:
+  - title: "Execution plans (Microsoft Learn)"
+    url: "https://learn.microsoft.com/sql/relational-databases/performance/execution-plans"
+  - title: "SQL Server index design guide (Microsoft Learn)"
+    url: "https://learn.microsoft.com/sql/relational-databases/sql-server-index-design-guide"
+  - title: "SET STATISTICS IO (Microsoft Learn)"
+    url: "https://learn.microsoft.com/sql/t-sql/statements/set-statistics-io-transact-sql"
+  - title: "Query processing architecture guide (Microsoft Learn)"
+    url: "https://learn.microsoft.com/sql/relational-databases/query-processing-architecture-guide"
+  - title: "Use The Index, Luke: SQL indexing and tuning"
+    url: "https://use-the-index-luke.com/"
+---
+
+A slow query is rarely fixed by guessing. It is fixed by measuring what the database actually did, then changing one thing at a time. This article covers the techniques that solve most real-world problems, with examples in T-SQL for SQL Server. The ideas apply to PostgreSQL and other engines with different syntax.
+
+The examples use two tables:
+
+```sql
+CREATE TABLE dbo.Customers (
+    CustomerId INT IDENTITY PRIMARY KEY,
+    Name       NVARCHAR(100) NOT NULL,
+    Country    CHAR(2)       NOT NULL
+);
+
+CREATE TABLE dbo.Orders (
+    OrderId     INT IDENTITY PRIMARY KEY,
+    CustomerId  INT           NOT NULL REFERENCES dbo.Customers(CustomerId),
+    OrderDate   DATETIME2     NOT NULL,
+    Status      VARCHAR(20)   NOT NULL,
+    TotalAmount DECIMAL(12,2) NOT NULL
+);
+```
+
+## Step 1: Measure before you change anything
+
+Turn on I/O and time statistics and capture the actual execution plan (in SSMS or Azure Data Studio, "Include Actual Execution Plan"):
+
+```sql
+SET STATISTICS IO ON;
+SET STATISTICS TIME ON;
+
+SELECT OrderId, OrderDate, TotalAmount
+FROM dbo.Orders
+WHERE CustomerId = 42 AND OrderDate >= '2026-01-01';
+```
+
+Watch **logical reads**. It is the most stable metric because it does not depend on server load or cache state the way duration does. If a query that returns 20 rows reads 50,000 pages, the work is being wasted somewhere.
+
+## Step 2: Read the execution plan for the expensive operator
+
+In the plan, look for the operators with the highest cost share and for these signals:
+
+- **Table Scan / Clustered Index Scan** on a large table when you expected a few rows: the engine could not use a useful index.
+- **Index Seek followed by Key Lookup**: the index found the rows but had to go back to the clustered index for extra columns, once per row.
+- **Large gaps between estimated and actual rows**: stale statistics or a predicate the optimizer cannot estimate well.
+- **Sort or Hash Match spilling to tempdb**: a warning icon on the operator.
+
+## Indexing that matches the query
+
+An index helps when its leading columns match your equality filters, followed by range filters. For the query above, `CustomerId` is an equality filter and `OrderDate` a range:
+
+```sql
+CREATE NONCLUSTERED INDEX IX_Orders_Customer_Date
+ON dbo.Orders (CustomerId, OrderDate)
+INCLUDE (TotalAmount);
+```
+
+Key columns decide how rows are found and ordered. `INCLUDE` columns are stored only in the leaf level so the index can **cover** the query, which removes the key lookup for the selected columns. Column order matters: an index on `(OrderDate, CustomerId)` would be far less useful for this query.
+
+Indexes are not free. Each one slows `INSERT`, `UPDATE` and `DELETE` and consumes storage. Create indexes for queries you actually run, and review unused ones periodically instead of indexing every column.
+
+## Write SARGable predicates
+
+A predicate is SARGable ("search argument able") when the engine can use an index seek. Wrapping the column in a function usually prevents that:
+
+```sql
+-- Not SARGable: the function must run for every row, so the index cannot be used for a seek
+SELECT OrderId FROM dbo.Orders WHERE YEAR(OrderDate) = 2026;
+
+-- SARGable: a range on the raw column
+SELECT OrderId FROM dbo.Orders
+WHERE OrderDate >= '2026-01-01' AND OrderDate < '2027-01-01';
+```
+
+The same applies to `LEFT(Name, 3) = 'Abc'` (use `Name LIKE 'Abc%'`), arithmetic on the column (`TotalAmount * 2 > 100` becomes `TotalAmount > 50`), and `WHERE ISNULL(Col, 0) = 0`.
+
+### Watch for implicit conversions
+
+If a column is `VARCHAR` and you compare it with an `NVARCHAR` value, data type precedence converts the column side, which can turn a seek into a scan. This often comes from application code: an ORM or ADO.NET parameter defaults to `NVARCHAR` while the column is `VARCHAR`. The plan shows a warning on the operator when this happens. Match the parameter type to the column type.
+
+## Joins: fewer rows, indexed keys, only the columns you need
+
+```sql
+SELECT c.Name, SUM(o.TotalAmount) AS Revenue
+FROM dbo.Customers AS c
+JOIN dbo.Orders    AS o ON o.CustomerId = c.CustomerId
+WHERE o.OrderDate >= '2026-01-01' AND o.OrderDate < '2027-01-01'
+GROUP BY c.Name;
+```
+
+Practical rules:
+
+- **Index foreign keys.** SQL Server does not create an index on a foreign key automatically, and joins and deletes against the parent suffer without one.
+- **Join on raw columns of matching types**, not expressions.
+- **Filter early.** Put restricting predicates in `WHERE` so the optimizer reduces rows before joining and aggregating.
+- **Avoid `SELECT *`.** It defeats covering indexes, sends unused data over the network and breaks when columns are added.
+
+You do not control join order or physical join type in normal queries; the optimizer chooses between nested loops, hash and merge joins from statistics. Your job is to give it good indexes and accurate statistics, not to force hints.
+
+## Subqueries: prefer EXISTS for "is there any"
+
+```sql
+-- Customers with at least one 2026 order
+SELECT c.CustomerId, c.Name
+FROM dbo.Customers AS c
+WHERE EXISTS (
+    SELECT 1 FROM dbo.Orders AS o
+    WHERE o.CustomerId = c.CustomerId AND o.OrderDate >= '2026-01-01'
+);
+```
+
+`EXISTS` can stop at the first match and never produces duplicates, unlike a `JOIN`, which would multiply customer rows. Modern optimizers often turn equivalent forms into the same plan, so check the actual plan rather than assuming. Two cases are not equivalent:
+
+- **`NOT IN` with NULLs**: if the subquery returns any `NULL`, `NOT IN` returns no rows at all. Use `NOT EXISTS` instead.
+- **Correlated subqueries in the `SELECT` list** that run once per row. Rewrite them as a join with aggregation, or `OUTER APPLY`.
+
+## Paging without the cost of large offsets
+
+`OFFSET ... FETCH` gets slower as the offset grows, because the skipped rows are still read:
+
+```sql
+-- Slow for deep pages
+SELECT OrderId, OrderDate FROM dbo.Orders
+ORDER BY OrderId
+OFFSET 100000 ROWS FETCH NEXT 50 ROWS ONLY;
+
+-- Keyset pagination: remember the last key from the previous page
+SELECT TOP (50) OrderId, OrderDate FROM dbo.Orders
+WHERE OrderId > @LastSeenOrderId
+ORDER BY OrderId;
+```
+
+Keyset paging needs a stable, indexed sort key but stays fast on any page.
+
+## Stored procedures: benefits and a classic problem
+
+Stored procedures give you plan reuse, a single place to tune and a smaller attack surface than string-built SQL. Parameterized queries from application code get the same plan caching, so they are not slower by themselves.
+
+The classic problem is **parameter sniffing**. SQL Server compiles the plan using the parameter values of the first call and caches it. If those values were unrepresentative (one customer with 3 orders, then another with 3 million), the cached plan can be terrible for later calls. Diagnose it by comparing the actual plan for fast and slow parameter values. Remedies, from least to most invasive:
+
+1. Update statistics and check indexes first.
+2. `OPTION (RECOMPILE)` on the one statement that varies a lot.
+3. `OPTIMIZE FOR` or splitting the procedure by workload shape.
+
+Do not scatter `WITH RECOMPILE` everywhere; it removes the plan-cache benefit.
+
+## Common mistakes at a glance
+
+| Mistake | Why it hurts | Fix |
+| --- | --- | --- |
+| Function on an indexed column in `WHERE` | Prevents index seeks | Rewrite as a range on the raw column |
+| `SELECT *` | Defeats covering indexes, wastes I/O | List needed columns |
+| Missing index on a foreign key | Slow joins and cascading deletes | Index the FK column |
+| Row-by-row loops or cursors | Thousands of round trips | Set-based `UPDATE`/`INSERT ... SELECT` |
+| ORM N+1 queries | One query per parent row | Eager-load with `Include`, or project to a DTO |
+| Index on every column | Slow writes, wasted storage | Index for real query patterns |
+| Tuning without measuring | Fixes the wrong thing | Logical reads + actual plan, change one thing |
+
+The N+1 problem deserves a special mention because it hides in application code. In Entity Framework Core, loading orders and then touching `order.Customer` in a loop issues one extra query per order. Use `.Include(o => o.Customer)` or, better, a `Select` projection that returns only the columns you need. The [ASP.NET Core API architecture article](/blog/clean-maintainable-aspnet-core-web-api/) shows where those queries should live.
+
+## A repeatable workflow
+
+1. Reproduce the slow query with realistic data volume.
+2. Record logical reads and the actual plan.
+3. Find the most expensive operator and the reason (scan, lookup, spill, bad estimate).
+4. Change one thing: an index, a predicate, or a rewrite.
+5. Measure again. Keep the change only if reads and duration improve for realistic parameters.
+
+Query tuning also matters for analytics work. The [SaaS reliability and incident analytics project](/projects/saas-reliability-incident-intelligence/) uses window functions, CTEs and `LAG` to answer operational questions, and the same indexing rules apply when those queries run over millions of rows.

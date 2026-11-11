@@ -25,7 +25,7 @@ const mimeTypes = {
 };
 
 const server = http.createServer((req, res) => {
-  let reqPath = req.url.split("?")[0];
+  let reqPath = decodeURIComponent(req.url.split("?")[0]);
   // Strip /portfolio prefix if present
   if (reqPath.startsWith("/portfolio")) {
     reqPath = reqPath.slice("/portfolio".length);

@@ -9,17 +9,15 @@ const basePath =
 
 export const profile: Profile = {
   name: "Yash Savaliya",
-  title: "Data Analyst & Full Stack Developer",
-  tagline: [
-    "Data Analytics, Business Intelligence & Full Stack Engineering",
-    "Analyzing 5,400+ RERA projects & building production SaaS platforms",
-  ],
+  title: "Full Stack .NET Developer & Data Analyst",
+  tagline: ["ASP.NET Core · Azure · SQL · Python · Data Analytics"],
   heroDescription:
-    "Full Stack Developer transitioning into Data Analytics. Combining 2+ years of backend and database engineering with exploratory data analysis (EDA), financial variance modeling, data quality auditing, and interactive BI dashboards.",
+    "I build production SaaS platforms with ASP.NET Core, Angular and Azure, and analyze data with SQL, Python and Excel. Based in Ahmedabad, India, with 2+ years of professional experience at iTechOps.",
   about:
-    "Full Stack Developer & Data Analyst with 2+ years of professional experience across SaaS engineering and analytical data modeling. Transitioning toward Data Analytics, leveraging rigorous data foundations in SQL Server, Excel Advanced (pivots, variance modeling, ETL pipelines), Python, and real estate econometric analysis across 5,400+ RERA filings in Ahmedabad.",
+    "I'm a Full Stack .NET Developer and aspiring Data Analyst based in Ahmedabad, India. For 2+ years I have built and maintained production SaaS platforms across monitoring, assessment and payment domains, working with C#, ASP.NET Core, Angular, SQL Server and Azure. Alongside engineering, I analyze data with SQL, Python (Pandas) and Excel: my projects include an analysis of 5,478 Ahmedabad RERA real estate registrations and an operational analytics study of SaaS incidents built on a clearly disclosed synthetic dataset.",
   avatar: `${basePath}/avatar.jpg`,
   avatarWebp: `${basePath}/avatar.webp`,
+  avatarSmall: `${basePath}/avatar-160.webp`,
   location: "Ahmedabad, Gujarat, India",
   resumeUrl: `${basePath}/resume.pdf`,
 };

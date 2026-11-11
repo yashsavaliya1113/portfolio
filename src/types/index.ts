@@ -15,6 +15,7 @@ export interface Profile {
   about: string;
   avatar: string;
   avatarWebp?: string;
+  avatarSmall?: string;
   location: string;
   resumeUrl: string;
 }
@@ -39,6 +40,8 @@ export interface Experience {
 export interface Project {
   slug: string;
   title: string;
+  /** Optional shorter <title> for search results. */
+  seoTitle?: string;
   description: string;
   fullDescription: string;
   image: string;

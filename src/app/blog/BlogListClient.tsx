@@ -12,10 +12,12 @@ interface Props {
 export function BlogListClient({ posts }: Props) {
   const [search, setSearch] = useState("");
 
+  const q = search.toLowerCase();
   const filtered = posts.filter(
     (p) =>
-      p.title.toLowerCase().includes(search.toLowerCase()) ||
-      p.tags.some((t) => t.toLowerCase().includes(search.toLowerCase())),
+      p.title.toLowerCase().includes(q) ||
+      p.category.toLowerCase().includes(q) ||
+      p.tags.some((t) => t.toLowerCase().includes(q)),
   );
 
   const categories = [...new Set(posts.map((p) => p.category))];
@@ -24,11 +26,21 @@ export function BlogListClient({ posts }: Props) {
     <div>
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setSearch("")}
+            aria-pressed={search === ""}
+            className="rounded-full border border-[var(--color-border)] px-3 py-1.5 text-xs font-medium transition-colors hover:border-primary/50 hover:text-primary aria-pressed:border-primary aria-pressed:text-primary"
+          >
+            All
+          </button>
           {categories.map((cat) => (
             <button
               key={cat}
+              type="button"
               onClick={() => setSearch(cat)}
-              className="rounded-full border border-[var(--color-border)] px-3 py-1.5 text-xs font-medium transition-colors hover:border-primary/50 hover:text-primary"
+              aria-pressed={search === cat}
+              className="rounded-full border border-[var(--color-border)] px-3 py-1.5 text-xs font-medium transition-colors hover:border-primary/50 hover:text-primary aria-pressed:border-primary aria-pressed:text-primary"
             >
               {cat}
             </button>
@@ -40,8 +52,9 @@ export function BlogListClient({ posts }: Props) {
             className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-muted)]"
           />
           <input
-            type="text"
-            placeholder="Search posts..."
+            type="search"
+            aria-label="Search articles"
+            placeholder="Search articles..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] py-2 pl-10 pr-4 text-sm outline-none transition-colors focus:border-primary sm:w-64"
@@ -55,7 +68,7 @@ export function BlogListClient({ posts }: Props) {
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((post, i) => (
-            <BlogCard key={post.slug} post={post} index={i} />
+            <BlogCard key={post.slug} post={post} index={i} as="h2" />
           ))}
         </div>
       )}
