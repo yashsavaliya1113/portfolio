@@ -1,0 +1,167 @@
+---
+title: "Entity Framework Core Performance: Fixing N+1 Queries and Tracking Overhead"
+seoTitle: "EF Core Performance: N+1 Queries and Tracking"
+description: "Diagnose N+1 queries and change-tracking overhead in EF Core, then fix them with projections, AsNoTracking, Include and split queries."
+date: "2026-11-11"
+modified: "2026-11-11"
+tags: ["EF Core", "Entity Framework Core", "Performance", "C#", "ASP.NET Core"]
+category: "Engineering"
+published: true
+relatedProjects: ["incident-management-platform", "payment-gateway"]
+relatedPosts: ["sql-query-optimization-techniques", "clean-maintainable-aspnet-core-web-api"]
+references:
+  - title: "Tracking vs. no-tracking queries (EF Core docs)"
+    url: "https://learn.microsoft.com/ef/core/querying/tracking"
+  - title: "Efficient querying (EF Core docs)"
+    url: "https://learn.microsoft.com/ef/core/performance/efficient-querying"
+  - title: "Eager loading of related data (EF Core docs)"
+    url: "https://learn.microsoft.com/ef/core/querying/related-data/eager"
+  - title: "Single vs. split queries (EF Core docs)"
+    url: "https://learn.microsoft.com/ef/core/querying/single-split-queries"
+  - title: "Logging and diagnostics in EF Core (Microsoft Learn)"
+    url: "https://learn.microsoft.com/ef/core/logging-events-diagnostics/"
+---
+
+Entity Framework Core is rarely slow because of the abstraction itself. It is slow because a page issues far more queries than the developer intended, or because the context spends time tracking hundreds of entities that are only being displayed. Both problems are easy to introduce and easy to miss on a development database with a few thousand rows.
+
+This article starts from a page that looks harmless, shows what EF Core actually sends to the database, and then fixes the query shape and the tracking cost. The examples use SQL Server, but the same rules apply to PostgreSQL and SQLite. The APIs shown are available in EF Core 7 and later; check the linked documentation for the exact surface in your version.
+
+## Measure the query, not the ORM
+
+Before changing code, make the generated SQL visible. In development, EF Core can log every command it executes:
+
+```csharp
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(connectionString)
+           .LogTo(Console.WriteLine, LogLevel.Information)
+           .EnableSensitiveDataLogging()); // development only: logs parameter values
+```
+
+`LogTo` writes the SQL, the parameters and the execution time. `EnableSensitiveDataLogging` includes values that would otherwise be redacted, so keep it out of production. When you want to inspect a single query without enabling logging, call `ToQueryString()` on the `IQueryable` before executing it.
+
+The log tells you two things that matter more than any micro-benchmark: how many commands a request sends, and how much data each command returns. A request that takes 800 ms because it sends 200 small queries needs a different fix from one that sends a single query returning 50,000 rows.
+
+## N+1 queries: many round trips for one page
+
+The N+1 pattern appears whenever code loads a list and then accesses a related entity for each row. With lazy loading enabled, this code looks completely ordinary:
+
+```csharp
+var orders = await db.Orders
+    .Where(o => o.CustomerId == customerId)
+    .ToListAsync(ct);
+
+foreach (var order in orders)
+{
+    // With lazy-loading proxies, each property access is another SQL query.
+    Console.WriteLine($"{order.Id}: {order.Customer.Name}");
+}
+```
+
+EF Core runs one query for the orders, then one query per order when `order.Customer` is touched. Ten orders means eleven round trips; a thousand orders means a thousand and one. Each round trip has network latency, parsing and planning cost, and each returns a full row even though the page needs one name.
+
+Lazy loading is not on by default. It requires the `Microsoft.EntityFrameworkCore.Proxies` package and `UseLazyLoadingProxies()`. Without it, `order.Customer` is simply `null` unless the relationship was loaded, which is why teams sometimes enable it to make navigation properties "just work" and later discover the query count. The safer default is to keep lazy loading off and load explicitly, so the number of queries is visible in the code.
+
+N+1 also hides behind helper methods and serialization. A controller that returns a list of entities, followed by a JSON serializer that walks navigation properties, can trigger the same pattern after the action has finished. If the response shape includes relationships, project it deliberately.
+
+## Fix N+1 with a projection
+
+Most read pages do not need entities at all. They need a handful of columns shaped for the screen. A `Select` that returns a record produces one SQL query and transfers only the requested columns:
+
+```csharp
+public sealed record OrderSummary(
+    int Id, DateTime OrderDate, decimal TotalAmount, string CustomerName);
+
+var summaries = await db.Orders
+    .Where(o => o.CustomerId == customerId)
+    .OrderByDescending(o => o.OrderDate)
+    .Select(o => new OrderSummary(
+        o.Id,
+        o.OrderDate,
+        o.TotalAmount,
+        o.Customer.Name))
+    .ToListAsync(ct);
+```
+
+EF Core translates the navigation access into a join, so the whole page is a single command. The projection also avoids materializing and tracking `Order` and `Customer` objects, which is where the second performance problem comes from.
+
+Use this as the default for list and detail endpoints. Keep entities for commands that genuinely need to modify a graph. If a projection grows complicated, that is usually a sign the screen needs a dedicated read model rather than a more clever LINQ query.
+
+## When you need entities: Include and split queries
+
+Sometimes the code really does need an object graph, for example to apply business rules across a customer and its orders. Eager loading makes the intent explicit:
+
+```csharp
+var customer = await db.Customers
+    .AsNoTracking()
+    .Include(c => c.Orders)
+        .ThenInclude(o => o.Lines)
+    .FirstOrDefaultAsync(c => c.Id == customerId, ct);
+```
+
+`Include` for a collection is translated into a join, so the customer row is repeated for every order and order line. That is correct but expensive when several collections are loaded at once: two collections of 100 rows each can produce 10,000 rows, the classic cartesian explosion. The database does the join work, and the network carries duplicated parent data.
+
+For read-only graphs with multiple collections, `AsSplitQuery()` issues a separate query per collection instead. It avoids the row multiplication, at the cost of more round trips and a weaker consistency guarantee: rows can change between the queries. There is no universal winner. Start with a single query, measure both, and choose for the endpoint rather than for the whole application. `AsSingleQuery()` explicitly restores the default.
+
+Do not add `Include` to every navigation "just in case". Each one widens the result and can silently change a fast endpoint into a slow one.
+
+## Tracking overhead: what the change tracker costs
+
+Every query is tracked by default. For each returned entity, the context keeps a snapshot of its property values so `SaveChanges` can detect what changed, and keeps the instance in an identity map so two queries return the same object. That is exactly what you want when updating data. For a read-only page it is pure overhead: extra memory, extra CPU for snapshotting and change detection, and a longer-lived context that grows with every query.
+
+Turn tracking off for reads:
+
+```csharp
+var activeProducts = await db.Products
+    .AsNoTracking()
+    .Where(p => p.IsActive)
+    .OrderBy(p => p.Name)
+    .ToListAsync(ct);
+```
+
+Two details are worth knowing. First, `AsNoTracking` entities are not fixed up against each other. If the same customer appears in several rows, you get separate instances. When that matters, use `AsNoTrackingWithIdentityResolution()`, which costs more but preserves one instance per key. Second, entities loaded with `AsNoTracking` are not tracked, so modifying them and calling `SaveChanges` does nothing. Attach them explicitly or load them tracked for updates.
+
+If an application is overwhelmingly read-heavy, set `QueryTrackingBehavior.NoTracking` globally and opt into tracking for commands:
+
+```csharp
+options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+```
+
+That flips the default in a way that is easy to forget, so make the write path obvious with an explicit `AsTracking()` or a tracked query in the repository or service that owns the update.
+
+## Batch operations and other high-value fixes
+
+Tracking and N+1 account for most problems, but a few more patterns are worth checking before tuning anything exotic.
+
+For bulk updates and deletes, `ExecuteUpdateAsync` and `ExecuteDeleteAsync` run a single SQL statement without loading entities into memory:
+
+```csharp
+var cutoff = DateTime.UtcNow.AddDays(-30);
+
+var expired = await db.Orders
+    .Where(o => o.Status == OrderStatus.Pending && o.CreatedAt < cutoff)
+    .ExecuteUpdateAsync(setters => setters
+        .SetProperty(o => o.Status, OrderStatus.Cancelled)
+        .SetProperty(o => o.CancelledAt, DateTime.UtcNow), ct);
+```
+
+These methods bypass the change tracker, so tracked entities in the same context are not updated automatically and interceptors or audits that depend on `SaveChanges` do not run. Use them where that behaviour is acceptable, and keep the number of affected rows in the logs.
+
+For inserts, prefer `AddRange` over calling `Add` inside a loop, and let EF Core batch the statements where the provider supports it. For a small set of very hot queries, a compiled query can remove the cost of translating the LINQ expression on every call, but the gain is usually modest and should be measured rather than assumed.
+
+Finally, page large result sets at the database, not in memory. `Skip`/`Take` before `ToListAsync` is the minimum; for deep pages, keyset pagination avoids the growing cost of large offsets. The [SQL query optimization guide](/blog/sql-query-optimization-techniques/) covers the index and predicate side of that problem in detail.
+
+## A practical order of fixes
+
+When an endpoint is slow, work through these steps in order:
+
+| Symptom | Likely cause | First fix |
+| --- | --- | --- |
+| Dozens of similar queries per request | N+1 / lazy loading | Project to a DTO, or eager-load explicitly |
+| Query returns many duplicate parent rows | Multiple collection `Include`s | Measure `AsSplitQuery()` |
+| High memory on read endpoints | Change tracking | `AsNoTracking()` or a projection |
+| Slow bulk status changes | Loading entities to change one column | `ExecuteUpdateAsync` |
+| Slow page numbers deep into a list | Large `OFFSET` | Keyset pagination |
+
+Change one thing, capture the SQL and the timing again, and keep the change only if it helps with realistic data volumes. A development database with a few hundred rows will happily hide an N+1 problem that is obvious in production.
+
+The [ASP.NET Core API architecture article](/blog/clean-maintainable-aspnet-core-web-api/) shows where these queries belong in a layered application, and the [incident management platform case study](/projects/incident-management-platform/) describes a system built on ASP.NET Core, EF Core and Azure SQL where query shape and indexing are part of the design rather than an afterthought.
