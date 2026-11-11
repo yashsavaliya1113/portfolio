@@ -64,6 +64,71 @@ export const projects: Project[] = [
     status: "completed",
   },
   {
+    slug: "saas-reliability-incident-intelligence",
+    title: "SaaS Reliability & Incident Intelligence",
+    description:
+      "Operational analytics project that turns SaaS incident and alert data into insights on recurring incidents, MTTR, SLA compliance and noisy alerts.",
+    fullDescription:
+      "An operational-intelligence analytics project set in a SaaS company that handles thousands of system alerts but struggles to identify recurring incidents, SLA risks and unreliable services. Built on a clearly disclosed synthetic dataset of 4,200 incidents and 52,000 alerts over 12 months (no employer or confidential data), validated and analyzed with Python/Pandas and Advanced SQL (window functions, CTEs), cross-checked between the two, and presented in an interactive dashboard with insights and recommendations.",
+    image: "/projects/saas-reliability.png",
+    screenshots: [],
+    technologies: [
+      "Python",
+      "Pandas",
+      "NumPy",
+      "Advanced SQL",
+      "Window Functions & CTEs",
+      "Data Cleaning",
+      "Exploratory Data Analysis",
+      "KPI Reporting",
+      "Dashboard Development",
+    ],
+    categories: ["Data Analytics", "Operational Analytics", "SaaS", "Business Intelligence"],
+    links: {
+      github: "https://github.com/yashsavaliya1113/portfolio/tree/main/analysis/saas-incidents",
+      dashboard: "/incident-analytics",
+    },
+    featured: true,
+    problem:
+      "A SaaS company receives thousands of system alerts but cannot easily see which services generate the most incidents, which incident categories take longest to resolve, which services breach SLA, or which alerts are noisy and repetitive. Without that view, recurring incidents and unreliable services go unaddressed.",
+    architecture:
+      "A seeded Python generator produces the synthetic incident and alert-rule tables; analyze.py validates them (unique IDs, no nulls, SLA flag consistency), runs ten SQL queries (window functions, CTEs, LAG, running totals) through SQLite, cross-checks the results against an independent Pandas pass, and writes the aggregates that the dashboard renders.",
+    features: [
+      "Incident trends: notification-service generated the most incidents (609); reporting-engine had the highest SLA breach rate (13.9%)",
+      "MTTR: Code Defect incidents take longest to resolve (avg 244.9 min), about 2.5x Deployment incidents (96.1 min)",
+      "SLA compliance: 91.3% overall, with 366 breaches across 4,200 incidents",
+      "Root cause: the top 5 root causes account for 38.3% of incidents; the largest is connection pool exhaustion (8.6%)",
+      "Repeat incidents: 34.0% repeat the same service and root cause within 7 days (SQL LAG window)",
+      "Alert intelligence: 6 noisy rules (75%+ auto-resolved) produce 60.7% of 52,000 alerts",
+      "Time analysis: incidents peak on Tuesday and Thursday and at 15:00; client analysis ranks tenants by downtime",
+    ],
+    databaseDesign:
+      "Two relational tables: incidents (service, tenant, category, root cause, severity, resolution minutes, SLA target, breach flag, tenant downtime) and alert_rules (fired, auto-resolved, linked incidents). The SQL runs on SQLite and uses standard syntax portable to SQL Server and PostgreSQL.",
+    apiDesign:
+      "Not applicable. This is an analytics project: Python/Pandas for generation, cleaning and EDA, SQL for analysis, and a JSON file of aggregates powering the dashboard.",
+    challenges: [
+      "Building a realistic synthetic dataset without using any confidential employer data",
+      "Defining consistent MTTR and SLA-breach logic across incident categories and services",
+    ],
+    lessonsLearned: [
+      "Clearly disclosing that the data is synthetic keeps operational analytics honest and credible.",
+    ],
+    futureImprovements: [
+      "Replace the synthetic dataset with anonymized real-world incident data where permitted",
+      "Build a Power BI version of the dashboard with scheduled refresh and SLA-risk alerting",
+    ],
+    timeline: "Completed",
+    metrics: [
+      { label: "Incidents Analyzed", value: "4,200" },
+      { label: "Alerts Analyzed", value: "52,000" },
+      { label: "SLA Compliance", value: "91.3%" },
+      { label: "Repeat Incidents", value: "34.0%" },
+      { label: "Noisy-Alert Volume", value: "60.7%" },
+      { label: "Data", value: "Synthetic" },
+    ],
+    status: "completed",
+  },
+  {
     slug: "white-label-assessment-platform",
     title: "White-Label Assessment Platform",
     description:

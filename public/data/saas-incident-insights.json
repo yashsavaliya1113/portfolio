@@ -1,0 +1,808 @@
+{
+  "synthetic": true,
+  "kpis": {
+    "incidents": 4200,
+    "alerts": 52000,
+    "avg_mttr_min": 164.2,
+    "median_mttr_min": 129.0,
+    "sla_compliance_pct": 91.3,
+    "sla_breaches": 366,
+    "downtime_hours": 7501.1,
+    "repeat_within_7d": 1426,
+    "repeat_within_7d_pct": 34.0,
+    "noise_pct": 71.1,
+    "noisy_rule_count": 6,
+    "noisy_rule_volume_pct": 60.7,
+    "date_from": "2025-07-01",
+    "date_to": "2026-06-30"
+  },
+  "services": [
+    {
+      "service": "reporting-engine",
+      "incidents": 462,
+      "avg_mttr_min": 192.8,
+      "breaches": 64,
+      "breach_pct": 13.9,
+      "downtime_min": 58196,
+      "breach_rank": 1
+    },
+    {
+      "service": "payment-processor",
+      "incidents": 535,
+      "avg_mttr_min": 208.2,
+      "breaches": 66,
+      "breach_pct": 12.3,
+      "downtime_min": 74265,
+      "breach_rank": 2
+    },
+    {
+      "service": "notification-service",
+      "incidents": 609,
+      "avg_mttr_min": 193.9,
+      "breaches": 61,
+      "breach_pct": 10.0,
+      "downtime_min": 76109,
+      "breach_rank": 3
+    },
+    {
+      "service": "data-sync-worker",
+      "incidents": 418,
+      "avg_mttr_min": 166.1,
+      "breaches": 41,
+      "breach_pct": 9.8,
+      "downtime_min": 44244,
+      "breach_rank": 4
+    },
+    {
+      "service": "billing-engine",
+      "incidents": 360,
+      "avg_mttr_min": 160.1,
+      "breaches": 30,
+      "breach_pct": 8.3,
+      "downtime_min": 38077,
+      "breach_rank": 5
+    },
+    {
+      "service": "analytics-collector",
+      "incidents": 306,
+      "avg_mttr_min": 146.7,
+      "breaches": 25,
+      "breach_pct": 8.2,
+      "downtime_min": 29572,
+      "breach_rank": 6
+    },
+    {
+      "service": "user-profile-api",
+      "incidents": 215,
+      "avg_mttr_min": 126.1,
+      "breaches": 13,
+      "breach_pct": 6.0,
+      "downtime_min": 16991,
+      "breach_rank": 7
+    },
+    {
+      "service": "file-storage",
+      "incidents": 208,
+      "avg_mttr_min": 136.9,
+      "breaches": 12,
+      "breach_pct": 5.8,
+      "downtime_min": 19319,
+      "breach_rank": 8
+    },
+    {
+      "service": "search-service",
+      "incidents": 253,
+      "avg_mttr_min": 140.1,
+      "breaches": 14,
+      "breach_pct": 5.5,
+      "downtime_min": 22869,
+      "breach_rank": 9
+    },
+    {
+      "service": "auth-service",
+      "incidents": 296,
+      "avg_mttr_min": 121.6,
+      "breaches": 15,
+      "breach_pct": 5.1,
+      "downtime_min": 23500,
+      "breach_rank": 10
+    },
+    {
+      "service": "admin-portal",
+      "incidents": 190,
+      "avg_mttr_min": 125.4,
+      "breaches": 9,
+      "breach_pct": 4.7,
+      "downtime_min": 15817,
+      "breach_rank": 11
+    },
+    {
+      "service": "api-gateway",
+      "incidents": 348,
+      "avg_mttr_min": 138.5,
+      "breaches": 16,
+      "breach_pct": 4.6,
+      "downtime_min": 31108,
+      "breach_rank": 12
+    }
+  ],
+  "categories": [
+    {
+      "category": "Code Defect",
+      "incidents": 695,
+      "avg_mttr_min": 244.9,
+      "max_mttr_min": 1491
+    },
+    {
+      "category": "Third-Party API",
+      "incidents": 830,
+      "avg_mttr_min": 201.6,
+      "max_mttr_min": 1035
+    },
+    {
+      "category": "Database",
+      "incidents": 854,
+      "avg_mttr_min": 161.8,
+      "max_mttr_min": 723
+    },
+    {
+      "category": "Capacity",
+      "incidents": 600,
+      "avg_mttr_min": 144.3,
+      "max_mttr_min": 748
+    },
+    {
+      "category": "Network",
+      "incidents": 463,
+      "avg_mttr_min": 117.5,
+      "max_mttr_min": 555
+    },
+    {
+      "category": "Deployment",
+      "incidents": 758,
+      "avg_mttr_min": 96.1,
+      "max_mttr_min": 763
+    }
+  ],
+  "root_causes": [
+    {
+      "root_cause": "Connection pool exhaustion",
+      "category": "Database",
+      "incidents": 362,
+      "share_pct": 8.6,
+      "cumulative_pct": 8.6
+    },
+    {
+      "root_cause": "Email provider timeout",
+      "category": "Third-Party API",
+      "incidents": 359,
+      "share_pct": 8.5,
+      "cumulative_pct": 17.2
+    },
+    {
+      "root_cause": "Payment gateway rate limiting",
+      "category": "Third-Party API",
+      "incidents": 322,
+      "share_pct": 7.7,
+      "cumulative_pct": 24.8
+    },
+    {
+      "root_cause": "Misconfigured environment variable",
+      "category": "Deployment",
+      "incidents": 288,
+      "share_pct": 6.9,
+      "cumulative_pct": 31.7
+    },
+    {
+      "root_cause": "Unhandled null reference",
+      "category": "Code Defect",
+      "incidents": 279,
+      "share_pct": 6.6,
+      "cumulative_pct": 38.3
+    },
+    {
+      "root_cause": "Retry storm / missing back-off",
+      "category": "Code Defect",
+      "incidents": 262,
+      "share_pct": 6.2,
+      "cumulative_pct": 44.6
+    },
+    {
+      "root_cause": "Queue backlog growth",
+      "category": "Capacity",
+      "incidents": 256,
+      "share_pct": 6.1,
+      "cumulative_pct": 50.7
+    },
+    {
+      "root_cause": "Failed schema migration",
+      "category": "Deployment",
+      "incidents": 224,
+      "share_pct": 5.3,
+      "cumulative_pct": 56.0
+    },
+    {
+      "root_cause": "Deadlock on hot table",
+      "category": "Database",
+      "incidents": 221,
+      "share_pct": 5.3,
+      "cumulative_pct": 61.3
+    },
+    {
+      "root_cause": "Memory leak in worker",
+      "category": "Capacity",
+      "incidents": 218,
+      "share_pct": 5.2,
+      "cumulative_pct": 66.5
+    },
+    {
+      "root_cause": "Load balancer health-check flap",
+      "category": "Network",
+      "incidents": 203,
+      "share_pct": 4.8,
+      "cumulative_pct": 71.3
+    },
+    {
+      "root_cause": "Slow query / missing index",
+      "category": "Database",
+      "incidents": 201,
+      "share_pct": 4.8,
+      "cumulative_pct": 76.1
+    },
+    {
+      "root_cause": "DNS resolution failure",
+      "category": "Network",
+      "incidents": 197,
+      "share_pct": 4.7,
+      "cumulative_pct": 80.8
+    },
+    {
+      "root_cause": "Bad release rollback",
+      "category": "Deployment",
+      "incidents": 172,
+      "share_pct": 4.1,
+      "cumulative_pct": 84.9
+    },
+    {
+      "root_cause": "Race condition in job scheduler",
+      "category": "Code Defect",
+      "incidents": 154,
+      "share_pct": 3.7,
+      "cumulative_pct": 88.5
+    },
+    {
+      "root_cause": "SMS provider outage",
+      "category": "Third-Party API",
+      "incidents": 149,
+      "share_pct": 3.5,
+      "cumulative_pct": 92.1
+    },
+    {
+      "root_cause": "Disk space exhaustion",
+      "category": "Capacity",
+      "incidents": 126,
+      "share_pct": 3.0,
+      "cumulative_pct": 95.1
+    },
+    {
+      "root_cause": "Certificate expired",
+      "category": "Deployment",
+      "incidents": 74,
+      "share_pct": 1.8,
+      "cumulative_pct": 96.8
+    },
+    {
+      "root_cause": "Replication lag",
+      "category": "Database",
+      "incidents": 70,
+      "share_pct": 1.7,
+      "cumulative_pct": 98.5
+    },
+    {
+      "root_cause": "Cross-region latency spike",
+      "category": "Network",
+      "incidents": 63,
+      "share_pct": 1.5,
+      "cumulative_pct": 100.0
+    }
+  ],
+  "alert_rules": [
+    {
+      "rule": "cpu_high_warning",
+      "service": "data-sync-worker",
+      "alerts_fired": 6842,
+      "auto_resolved": 6360,
+      "noise_pct": 93.0,
+      "incidents_linked": 126,
+      "volume_share_pct": 13.2
+    },
+    {
+      "rule": "health_check_flap",
+      "service": "api-gateway",
+      "alerts_fired": 6082,
+      "auto_resolved": 5774,
+      "noise_pct": 94.9,
+      "incidents_linked": 72,
+      "volume_share_pct": 11.7
+    },
+    {
+      "rule": "disk_space_warning",
+      "service": "file-storage",
+      "alerts_fired": 5322,
+      "auto_resolved": 4770,
+      "noise_pct": 89.6,
+      "incidents_linked": 119,
+      "volume_share_pct": 10.2
+    },
+    {
+      "rule": "queue_depth_warning",
+      "service": "notification-service",
+      "alerts_fired": 4942,
+      "auto_resolved": 4048,
+      "noise_pct": 81.9,
+      "incidents_linked": 218,
+      "volume_share_pct": 9.5
+    },
+    {
+      "rule": "memory_usage_warning",
+      "service": "reporting-engine",
+      "alerts_fired": 4561,
+      "auto_resolved": 4036,
+      "noise_pct": 88.5,
+      "incidents_linked": 133,
+      "volume_share_pct": 8.8
+    },
+    {
+      "rule": "latency_p95_warning",
+      "service": "search-service",
+      "alerts_fired": 3801,
+      "auto_resolved": 2931,
+      "noise_pct": 77.1,
+      "incidents_linked": 201,
+      "volume_share_pct": 7.3
+    },
+    {
+      "rule": "email_delivery_failed",
+      "service": "notification-service",
+      "alerts_fired": 2661,
+      "auto_resolved": 1185,
+      "noise_pct": 44.5,
+      "incidents_linked": 360,
+      "volume_share_pct": 5.1
+    },
+    {
+      "rule": "http_5xx_rate",
+      "service": "api-gateway",
+      "alerts_fired": 2281,
+      "auto_resolved": 797,
+      "noise_pct": 34.9,
+      "incidents_linked": 371,
+      "volume_share_pct": 4.4
+    },
+    {
+      "rule": "job_failed",
+      "service": "data-sync-worker",
+      "alerts_fired": 2281,
+      "auto_resolved": 1134,
+      "noise_pct": 49.7,
+      "incidents_linked": 276,
+      "volume_share_pct": 4.4
+    },
+    {
+      "rule": "db_connection_pool_high",
+      "service": "billing-engine",
+      "alerts_fired": 1901,
+      "auto_resolved": 784,
+      "noise_pct": 41.2,
+      "incidents_linked": 281,
+      "volume_share_pct": 3.7
+    },
+    {
+      "rule": "payment_timeout",
+      "service": "payment-processor",
+      "alerts_fired": 1901,
+      "auto_resolved": 510,
+      "noise_pct": 26.8,
+      "incidents_linked": 337,
+      "volume_share_pct": 3.7
+    },
+    {
+      "rule": "report_generation_slow",
+      "service": "reporting-engine",
+      "alerts_fired": 1901,
+      "auto_resolved": 1140,
+      "noise_pct": 60.0,
+      "incidents_linked": 184,
+      "volume_share_pct": 3.7
+    },
+    {
+      "rule": "login_failure_spike",
+      "service": "auth-service",
+      "alerts_fired": 1368,
+      "auto_resolved": 753,
+      "noise_pct": 55.0,
+      "incidents_linked": 150,
+      "volume_share_pct": 2.6
+    },
+    {
+      "rule": "collector_dropped_events",
+      "service": "analytics-collector",
+      "alerts_fired": 1216,
+      "auto_resolved": 734,
+      "noise_pct": 60.4,
+      "incidents_linked": 116,
+      "volume_share_pct": 2.3
+    },
+    {
+      "rule": "webhook_retry_exhausted",
+      "service": "payment-processor",
+      "alerts_fired": 1140,
+      "auto_resolved": 429,
+      "noise_pct": 37.6,
+      "incidents_linked": 176,
+      "volume_share_pct": 2.2
+    },
+    {
+      "rule": "profile_api_latency",
+      "service": "user-profile-api",
+      "alerts_fired": 1064,
+      "auto_resolved": 623,
+      "noise_pct": 58.6,
+      "incidents_linked": 110,
+      "volume_share_pct": 2.0
+    },
+    {
+      "rule": "replication_lag",
+      "service": "billing-engine",
+      "alerts_fired": 912,
+      "auto_resolved": 357,
+      "noise_pct": 39.1,
+      "incidents_linked": 133,
+      "volume_share_pct": 1.8
+    },
+    {
+      "rule": "storage_upload_error",
+      "service": "file-storage",
+      "alerts_fired": 760,
+      "auto_resolved": 335,
+      "noise_pct": 44.1,
+      "incidents_linked": 101,
+      "volume_share_pct": 1.5
+    },
+    {
+      "rule": "deadlock_detected",
+      "service": "billing-engine",
+      "alerts_fired": 760,
+      "auto_resolved": 188,
+      "noise_pct": 24.7,
+      "incidents_linked": 145,
+      "volume_share_pct": 1.5
+    },
+    {
+      "rule": "cert_expiry_soon",
+      "service": "admin-portal",
+      "alerts_fired": 304,
+      "auto_resolved": 61,
+      "noise_pct": 20.1,
+      "incidents_linked": 62,
+      "volume_share_pct": 0.6
+    }
+  ],
+  "hours": [
+    {
+      "hour": 0,
+      "incidents": 65
+    },
+    {
+      "hour": 1,
+      "incidents": 45
+    },
+    {
+      "hour": 2,
+      "incidents": 195
+    },
+    {
+      "hour": 3,
+      "incidents": 44
+    },
+    {
+      "hour": 4,
+      "incidents": 54
+    },
+    {
+      "hour": 5,
+      "incidents": 61
+    },
+    {
+      "hour": 6,
+      "incidents": 88
+    },
+    {
+      "hour": 7,
+      "incidents": 125
+    },
+    {
+      "hour": 8,
+      "incidents": 209
+    },
+    {
+      "hour": 9,
+      "incidents": 265
+    },
+    {
+      "hour": 10,
+      "incidents": 293
+    },
+    {
+      "hour": 11,
+      "incidents": 232
+    },
+    {
+      "hour": 12,
+      "incidents": 155
+    },
+    {
+      "hour": 13,
+      "incidents": 183
+    },
+    {
+      "hour": 14,
+      "incidents": 419
+    },
+    {
+      "hour": 15,
+      "incidents": 486
+    },
+    {
+      "hour": 16,
+      "incidents": 421
+    },
+    {
+      "hour": 17,
+      "incidents": 406
+    },
+    {
+      "hour": 18,
+      "incidents": 119
+    },
+    {
+      "hour": 19,
+      "incidents": 93
+    },
+    {
+      "hour": 20,
+      "incidents": 60
+    },
+    {
+      "hour": 21,
+      "incidents": 63
+    },
+    {
+      "hour": 22,
+      "incidents": 63
+    },
+    {
+      "hour": 23,
+      "incidents": 56
+    }
+  ],
+  "weekdays": [
+    {
+      "day": "Mon",
+      "incidents": 607
+    },
+    {
+      "day": "Tue",
+      "incidents": 997
+    },
+    {
+      "day": "Wed",
+      "incidents": 591
+    },
+    {
+      "day": "Thu",
+      "incidents": 996
+    },
+    {
+      "day": "Fri",
+      "incidents": 534
+    },
+    {
+      "day": "Sat",
+      "incidents": 242
+    },
+    {
+      "day": "Sun",
+      "incidents": 233
+    }
+  ],
+  "monthly": [
+    {
+      "month": "2025-07",
+      "incidents": 326,
+      "avg_mttr_min": 155.6,
+      "sla_compliance_pct": 89.9,
+      "mom_change": null
+    },
+    {
+      "month": "2025-08",
+      "incidents": 317,
+      "avg_mttr_min": 171.3,
+      "sla_compliance_pct": 89.9,
+      "mom_change": -9.0
+    },
+    {
+      "month": "2025-09",
+      "incidents": 329,
+      "avg_mttr_min": 173.0,
+      "sla_compliance_pct": 90.6,
+      "mom_change": 12.0
+    },
+    {
+      "month": "2025-10",
+      "incidents": 328,
+      "avg_mttr_min": 169.6,
+      "sla_compliance_pct": 92.7,
+      "mom_change": -1.0
+    },
+    {
+      "month": "2025-11",
+      "incidents": 306,
+      "avg_mttr_min": 164.7,
+      "sla_compliance_pct": 92.2,
+      "mom_change": -22.0
+    },
+    {
+      "month": "2025-12",
+      "incidents": 378,
+      "avg_mttr_min": 149.1,
+      "sla_compliance_pct": 92.1,
+      "mom_change": 72.0
+    },
+    {
+      "month": "2026-01",
+      "incidents": 362,
+      "avg_mttr_min": 161.6,
+      "sla_compliance_pct": 89.2,
+      "mom_change": -16.0
+    },
+    {
+      "month": "2026-02",
+      "incidents": 324,
+      "avg_mttr_min": 166.6,
+      "sla_compliance_pct": 91.0,
+      "mom_change": -38.0
+    },
+    {
+      "month": "2026-03",
+      "incidents": 367,
+      "avg_mttr_min": 167.0,
+      "sla_compliance_pct": 92.6,
+      "mom_change": 43.0
+    },
+    {
+      "month": "2026-04",
+      "incidents": 387,
+      "avg_mttr_min": 165.1,
+      "sla_compliance_pct": 92.2,
+      "mom_change": 20.0
+    },
+    {
+      "month": "2026-05",
+      "incidents": 387,
+      "avg_mttr_min": 163.0,
+      "sla_compliance_pct": 92.2,
+      "mom_change": 0.0
+    },
+    {
+      "month": "2026-06",
+      "incidents": 389,
+      "avg_mttr_min": 165.6,
+      "sla_compliance_pct": 90.5,
+      "mom_change": 2.0
+    }
+  ],
+  "tenants": [
+    {
+      "tenant": "Orion Logistics",
+      "incidents": 735,
+      "downtime_min": 77165,
+      "sla_breaches": 60,
+      "downtime_rank": 1
+    },
+    {
+      "tenant": "Helix Health",
+      "incidents": 680,
+      "downtime_min": 74365,
+      "sla_breaches": 62,
+      "downtime_rank": 2
+    },
+    {
+      "tenant": "Pinnacle Finance",
+      "incidents": 660,
+      "downtime_min": 71904,
+      "sla_breaches": 63,
+      "downtime_rank": 3
+    },
+    {
+      "tenant": "Cedar Retail",
+      "incidents": 535,
+      "downtime_min": 56411,
+      "sla_breaches": 45,
+      "downtime_rank": 4
+    },
+    {
+      "tenant": "Vertex Telecom",
+      "incidents": 504,
+      "downtime_min": 51906,
+      "sla_breaches": 40,
+      "downtime_rank": 5
+    },
+    {
+      "tenant": "Atlas Education",
+      "incidents": 378,
+      "downtime_min": 45540,
+      "sla_breaches": 38,
+      "downtime_rank": 6
+    },
+    {
+      "tenant": "Nimbus Media",
+      "incidents": 439,
+      "downtime_min": 45320,
+      "sla_breaches": 39,
+      "downtime_rank": 7
+    },
+    {
+      "tenant": "Summit Energy",
+      "incidents": 269,
+      "downtime_min": 27456,
+      "sla_breaches": 19,
+      "downtime_rank": 8
+    }
+  ],
+  "severity": [
+    {
+      "severity": "P1",
+      "incidents": 356,
+      "avg_mttr_min": 104.0,
+      "sla_target_min": 60,
+      "sla_compliance_pct": 33.4
+    },
+    {
+      "severity": "P2",
+      "incidents": 883,
+      "avg_mttr_min": 122.7,
+      "sla_target_min": 240,
+      "sla_compliance_pct": 90.6
+    },
+    {
+      "severity": "P3",
+      "incidents": 1873,
+      "avg_mttr_min": 159.8,
+      "sla_target_min": 480,
+      "sla_compliance_pct": 97.6
+    },
+    {
+      "severity": "P4",
+      "incidents": 1088,
+      "avg_mttr_min": 225.0,
+      "sla_target_min": 1440,
+      "sla_compliance_pct": 99.9
+    }
+  ],
+  "insights": [
+    "notification-service generated the most incidents (609), while reporting-engine had the highest SLA breach rate (13.9%).",
+    "Code Defect incidents take longest to resolve (avg 244.9 min), about 2.5x Deployment (96.1 min).",
+    "The top 5 root causes account for 38.3% of all incidents; the largest is 'Connection pool exhaustion' (8.6%).",
+    "34.0% of incidents repeat the same service and root cause within 7 days of the previous one.",
+    "6 noisy alert rules (75%+ auto-resolved) produce 60.7% of all alert volume.",
+    "Incidents peak on Tue and Thu, and at 15:00.",
+    "Orion Logistics lost the most time to incidents (1286.1 downtime hours across 735 incidents)."
+  ],
+  "recommendations": [
+    "Add an automated runbook and connection-pool alerting for 'Connection pool exhaustion' and the other top recurring causes.",
+    "Review on-call coverage and SLA targets for reporting-engine and payment-processor, the services breaching SLA most often.",
+    "Tune or aggregate the 6 noisy alert rules to cut alert fatigue and surface real incidents.",
+    "Schedule risky deployments away from the Tuesday/Thursday afternoon peak and add pre-deploy checks."
+  ]
+}
