@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ArrowUpRight, FileDown, Mail, MapPin, Phone, Check, Copy } from "lucide-react";
 import { SectionHeading } from "@/components/SectionHeading";
 import { Loader } from "@/components/Loader";
+import { ResumeDownload } from "@/components/ResumeDownload";
 import { useToast } from "@/components/Toaster";
 import { siteConfig } from "@/config/site";
 import { profile } from "@/config/profile";
@@ -78,15 +79,7 @@ export function ContactSection() {
                 LinkedIn
                 <ArrowUpRight size={14} />
               </a>
-              <a
-                href={profile.resumeUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-primary-dark"
-              >
-                <FileDown size={14} />
-                Download Resume
-              </a>
+              <ResumeDownload label="Download Resume" variant="primary" />
               <button
                 type="button"
                 onClick={handleCopyEmail}

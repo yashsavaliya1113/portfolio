@@ -1,6 +1,7 @@
-import { ArrowRight, FileDown } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { GitHubIcon } from "@/components/GitHubIcon";
+import { ResumeDownload } from "@/components/ResumeDownload";
 import { profile } from "@/config/profile";
 import { siteConfig } from "@/config/site";
 
@@ -41,15 +42,7 @@ export function Hero() {
                 <GitHubIcon size={14} />
                 GitHub
               </a>
-              <a
-                href={profile.resumeUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-2.5 text-sm font-medium transition-colors hover:border-primary/50"
-              >
-                <FileDown size={14} />
-                Resume
-              </a>
+              <ResumeDownload label="Resume" variant="outline" />
             </div>
           </div>
           <div className="hidden lg:block">

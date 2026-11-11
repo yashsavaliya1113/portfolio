@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Menu, X, FileDown } from "lucide-react";
 import Link from "next/link";
 import { ThemeToggle } from "./ThemeToggle";
+import { ResumeDownload } from "./ResumeDownload";
+import { resumes } from "@/config/resumes";
 import { navigation } from "@/config/navigation";
 import { profile } from "@/config/profile";
 import { useScrollProgress } from "@/hooks/useScrollProgress";
@@ -40,15 +42,7 @@ export function Navbar() {
           ))}
           <div className="ml-2 flex items-center gap-2">
             <ThemeToggle />
-            <a
-              href={profile.resumeUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-all hover:bg-primary-dark"
-            >
-              <FileDown size={14} />
-              Resume
-            </a>
+            <ResumeDownload label="Resume" variant="primary" align="right" />
           </div>
         </div>
 
@@ -80,15 +74,21 @@ export function Navbar() {
               {item.label}
             </Link>
           ))}
-          <a
-            href={profile.resumeUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-2 flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white"
-          >
-            <FileDown size={14} />
-            Download Resume
-          </a>
+          <div className="mt-3 space-y-1 border-t border-[var(--color-border)] pt-3">
+            <p className="px-3 text-xs font-medium uppercase tracking-wider text-[var(--color-muted)]">Download resume</p>
+            {resumes.map((r) => (
+              <a
+                key={r.id}
+                href={r.href}
+                download={r.filename}
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2 rounded-md px-3 py-2.5 text-sm text-[var(--color-text)] hover:bg-[var(--color-surface)]"
+              >
+                <FileDown size={14} aria-hidden="true" />
+                {r.label}
+              </a>
+            ))}
+          </div>
         </div>
       </div>
     </header>

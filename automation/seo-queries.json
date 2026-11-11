@@ -1,0 +1,27 @@
+{
+  "site": "https://yashsavaliya1113.github.io/portfolio",
+  "host": "yashsavaliya1113.github.io",
+  "searchQueries": [
+    "Yash Savaliya",
+    "Yash Savaliya portfolio",
+    "Yash Savaliya .NET developer",
+    "Yash Savaliya data analyst",
+    ".NET developer Ahmedabad",
+    "ASP.NET Core developer Ahmedabad",
+    "C# developer Ahmedabad",
+    "Full Stack .NET developer India",
+    "data analyst Ahmedabad SQL Python Power BI",
+    "Ahmedabad RERA data analysis"
+  ],
+  "aiQuestions": [
+    "Who is Yash Savaliya, the .NET developer and data analyst from Ahmedabad?",
+    "Can you recommend a Full Stack .NET developer in Ahmedabad, India?",
+    "Who is a data analyst in Ahmedabad with SQL, Python and Power BI skills?"
+  ],
+  "lighthousePages": [
+    "/",
+    "/ai-lab/",
+    "/blog/",
+    "/blog/clean-maintainable-aspnet-core-web-api/"
+  ]
+}

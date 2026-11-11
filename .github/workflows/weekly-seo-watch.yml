@@ -1,0 +1,74 @@
+name: Weekly SEO watch
+
+# Every Monday: health-check the live site, run Lighthouse, and use Playwright to see where the site appears on Bing and
+# DuckDuckGo for the queries in automation/seo-queries.json. The report is shown on the workflow run's summary page and
+# kept as an artifact (also used to compare with the previous week). It never opens issues or sends alerts.
+# Details: docs/automation.md
+
+on:
+  schedule:
+    - cron: "0 5 * * 1" # Mondays 05:00 UTC (10:30 IST), after the blog draft job
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read # to download last week's report artifact
+
+concurrency:
+  group: weekly-seo-watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install the Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Lighthouse on the live site
+        run: |
+          mkdir -p lh
+          SITE=$(node -p "require('./automation/seo-queries.json').site")
+          i=0
+          for p in $(node -p "require('./automation/seo-queries.json').lighthousePages.join(' ')"); do
+            i=$((i+1))
+            npx --yes lighthouse@12 "$SITE$p" --quiet \
+              --chrome-flags="--headless=new --no-sandbox" \
+              --only-categories=performance,accessibility,best-practices,seo \
+              --output=json --output-path="lh/page$i.json" || echo "Lighthouse failed for $p"
+          done
+
+      - name: Download last week's state (if any)
+        run: |
+          run_id=$(gh run list --workflow weekly-seo-watch.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId // empty')
+          if [ -n "$run_id" ]; then
+            gh run download "$run_id" --name seo-watch-report --dir prev || true
+            if [ -f prev/state.json ]; then cp prev/state.json prev-state.json; fi
+          fi
+
+      - name: Run the SEO watch
+        run: node scripts/seo-watch.mjs
+
+      - name: Show the report on the run summary
+        run: cat report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Keep the report and state for next week
+        uses: actions/upload-artifact@v4
+        with:
+          name: seo-watch-report
+          path: |
+            report.md
+            state.json
+          retention-days: 90
