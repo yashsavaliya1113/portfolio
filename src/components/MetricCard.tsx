@@ -1,5 +1,3 @@
-"use client";
-
 interface Props {
   label: string;
   value: string;

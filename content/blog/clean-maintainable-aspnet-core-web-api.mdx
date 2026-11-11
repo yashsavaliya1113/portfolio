@@ -1,0 +1,198 @@
+---
+title: "Building a Clean and Maintainable ASP.NET Core Web API: Architecture, Dependency Injection and Best Practices"
+seoTitle: "Clean ASP.NET Core Web API: Architecture and DI"
+description: "A practical guide to a clean ASP.NET Core Web API: thin controllers, services, DI lifetimes, when to use repositories, ProblemDetails errors and validation."
+date: "2026-11-11"
+modified: "2026-11-11"
+tags: ["ASP.NET Core", "C#", "Web API", "Dependency Injection", "Architecture"]
+category: "Engineering"
+published: true
+relatedProjects: ["payment-gateway", "incident-management-platform"]
+relatedPosts: ["sql-query-optimization-techniques", "deploying-applications-on-azure-guide"]
+references:
+  - title: "Create web APIs with ASP.NET Core (Microsoft Learn)"
+    url: "https://learn.microsoft.com/aspnet/core/web-api/"
+  - title: "Dependency injection in ASP.NET Core (Microsoft Learn)"
+    url: "https://learn.microsoft.com/aspnet/core/fundamentals/dependency-injection"
+  - title: "Handle errors in ASP.NET Core APIs (Microsoft Learn)"
+    url: "https://learn.microsoft.com/aspnet/core/web-api/handle-errors"
+  - title: "DbContext lifetime, configuration and initialization (Microsoft Learn)"
+    url: "https://learn.microsoft.com/ef/core/dbcontext-configuration/"
+---
+
+Most ASP.NET Core APIs start clean and become hard to change around the second year: controllers that talk to the database, validation scattered across layers, and exceptions turned into `500` responses by accident. None of that needs a heavyweight architecture to fix. A few consistent decisions are enough.
+
+This article walks through one small but complete API (create and fetch a product) and explains each decision. Everything below was compiled and run on .NET 10; the same code works on .NET 8.
+
+## The shape of the solution
+
+Keep responsibilities in four places and let dependencies point inward:
+
+| Piece | Responsibility | Knows about |
+| --- | --- | --- |
+| Controller | HTTP in, HTTP out: routing, status codes | Application service, request/response contracts |
+| Application service | Use cases and business rules | `DbContext` (or a repository), domain types |
+| Domain / data | Entities, EF Core mappings | Nothing above it |
+| Cross-cutting | Error handling, logging, validation plumbing | Registered once in `Program.cs` |
+
+For small and medium APIs this fits in one project with folders. Split into multiple projects only when a real need appears, such as a shared domain library or a strict compile-time boundary.
+
+## Keep controllers thin
+
+A controller should translate HTTP to a method call and back. If you find an `if` that encodes a business rule, it belongs in a service.
+
+```csharp
+[ApiController]
+[Route("api/products")]
+public class ProductsController(IProductService products) : ControllerBase
+{
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<ProductResponse>> Get(int id, CancellationToken ct) =>
+        Ok(await products.GetAsync(id, ct));
+
+    [HttpPost]
+    public async Task<ActionResult<ProductResponse>> Create(
+        CreateProductRequest request, CancellationToken ct)
+    {
+        var created = await products.CreateAsync(request, ct);
+        return CreatedAtAction(nameof(Get), new { id = created.Id }, created);
+    }
+}
+```
+
+Two small habits pay off here. Accept a `CancellationToken` so abandoned requests stop doing work, and return dedicated request/response types rather than EF entities, so a database change never silently changes your public contract.
+
+## Dependency injection: lifetimes decide correctness
+
+Registration is one line per service, but the lifetime you choose affects correctness:
+
+```csharp
+builder.Services.AddDbContext<AppDbContext>(o => o.UseSqlServer(connectionString)); // scoped by default
+builder.Services.AddScoped<IProductService, ProductService>();
+```
+
+- **Transient**: a new instance every time. Good for lightweight, stateless helpers.
+- **Scoped**: one instance per HTTP request. The right choice for anything that uses `DbContext`.
+- **Singleton**: one instance for the app's lifetime. Only for thread-safe, stateless or cache-like services.
+
+### The captive dependency trap
+
+A singleton must never depend on a scoped service. The scoped service gets "captured" and lives far longer than intended, which for a `DbContext` means shared state across requests and thread-safety bugs. In development, ASP.NET Core validates scopes and throws at startup for the simplest cases, so do not turn that off. When a singleton genuinely needs a scoped service (for example a background worker), inject `IServiceScopeFactory` and create a scope per unit of work.
+
+Prefer constructor injection with primary constructors, as above. It makes dependencies explicit and the class easy to test with a fake.
+
+## Do you need the repository pattern?
+
+Often not. `DbContext` already implements the unit-of-work and repository ideas: `DbSet<T>` is a collection-like abstraction and `SaveChangesAsync` commits a unit of work. Wrapping it in a generic `IRepository<T>` frequently adds a layer that mirrors EF method for method and hides useful features such as projections and `AsNoTracking`.
+
+A repository earns its place when:
+
+- You have complex, reused queries that deserve a name (`GetOverdueInvoicesAsync`) instead of being copy-pasted.
+- You need to swap the data store, or isolate a legacy store behind your own interface.
+- You want tests that do not touch EF at all (although an in-memory or containerized database often gives more honest tests).
+
+If none of these apply, inject `DbContext` into the application service and keep queries there. You can introduce a repository later without changing controllers.
+
+## Application services: where the rules live
+
+```csharp
+public class ProductService(AppDbContext db) : IProductService
+{
+    public async Task<ProductResponse> GetAsync(int id, CancellationToken ct)
+    {
+        var product = await db.Products.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id, ct)
+            ?? throw new NotFoundException($"Product {id} was not found.");
+        return new ProductResponse(product.Id, product.Name, product.Price);
+    }
+
+    public async Task<ProductResponse> CreateAsync(CreateProductRequest request, CancellationToken ct)
+    {
+        var product = new Product { Name = request.Name.Trim(), Price = request.Price };
+        db.Products.Add(product);
+        await db.SaveChangesAsync(ct);
+        return new ProductResponse(product.Id, product.Name, product.Price);
+    }
+}
+```
+
+The service throws a domain-specific `NotFoundException` instead of returning `null` and letting every controller decide what that means. That keeps the HTTP vocabulary out of the business layer.
+
+## Validation: let the framework do the boring part
+
+With `[ApiController]`, model validation runs automatically and invalid requests get a `400` with a standard `ValidationProblemDetails` body before your action executes. For simple rules, data annotations on the request type are enough:
+
+```csharp
+public sealed record CreateProductRequest(
+    [Required, StringLength(100)] string Name,
+    [Range(0.01, 100000)] decimal Price);
+```
+
+> **A pitfall worth knowing:** on a C# `record`, put the attribute on the constructor parameter, as above. Writing `[property: Required]` compiles fine but throws an `InvalidOperationException` on the first request: "validation metadata defined on property ... will be ignored". It shows up as a `500`, not a build error, so it is easy to ship.
+
+Invalid input now returns:
+
+```json
+{
+  "title": "One or more validation errors occurred.",
+  "status": 400,
+  "errors": {
+    "Name": ["The Name field is required."],
+    "Price": ["The field Price must be between 0.01 and 100000."]
+  }
+}
+```
+
+Use a library such as FluentValidation when rules depend on other fields, need database lookups, or must be shared. Keep the rule "shape and format belongs at the edge; business invariants belong in the service" either way.
+
+## Centralized error handling with ProblemDetails
+
+Without a plan, unhandled exceptions leak stack traces in development and return empty `500` bodies in production. Since .NET 8 the clean answer is `IExceptionHandler` combined with `AddProblemDetails`, which produces RFC 9457 responses consistently:
+
+```csharp
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+var app = builder.Build();
+app.UseExceptionHandler();
+```
+
+```csharp
+public class GlobalExceptionHandler(IProblemDetailsService problems, ILogger<GlobalExceptionHandler> logger)
+    : IExceptionHandler
+{
+    public async ValueTask<bool> TryHandleAsync(
+        HttpContext context, Exception exception, CancellationToken ct)
+    {
+        var (status, title) = exception switch
+        {
+            NotFoundException => (StatusCodes.Status404NotFound, "Resource not found"),
+            _ => (StatusCodes.Status500InternalServerError, "An unexpected error occurred")
+        };
+
+        if (status == StatusCodes.Status500InternalServerError)
+            logger.LogError(exception, "Unhandled exception");
+
+        context.Response.StatusCode = status;
+        return await problems.TryWriteAsync(new ProblemDetailsContext
+        {
+            HttpContext = context,
+            Exception = exception,
+            ProblemDetails = { Status = status, Title = title,
+                               Detail = status == 404 ? exception.Message : null }
+        });
+    }
+}
+```
+
+Two rules keep this safe. Only expose a `Detail` message for exceptions you wrote on purpose, and log the full exception for everything else without returning it. A missing product now returns a tidy `404` with a `traceId` the client can quote when reporting a problem.
+
+## A short checklist
+
+1. Controllers translate HTTP; services hold rules; contracts are separate from entities.
+2. Register `DbContext` and its consumers as scoped; never inject scoped into singleton.
+3. Add a repository only for a concrete reason you can name.
+4. Validate shape at the edge, enforce business invariants in services.
+5. Handle exceptions in one place and return `ProblemDetails`.
+6. Pass `CancellationToken` through to EF Core calls.
+
+Query performance is the next thing that usually goes wrong in a well-structured API. See [SQL query optimization: practical techniques every developer should know](/blog/sql-query-optimization-techniques/), and for getting the API into production, the [Azure deployment guide](/blog/deploying-applications-on-azure-guide/). For a layered ASP.NET Core application described end to end, see the [incident management platform case study](/projects/incident-management-platform/).
