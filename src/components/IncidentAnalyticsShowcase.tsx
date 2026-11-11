@@ -1,7 +1,4 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { Download, Loader2, TriangleAlert } from "lucide-react";
+import { Download } from "lucide-react";
 
 const BASE_PATH =
   process.env.NEXT_PUBLIC_BASE_PATH !== undefined
@@ -9,7 +6,6 @@ const BASE_PATH =
     : process.env.NODE_ENV === "production"
       ? "/portfolio"
       : "";
-const DATA_URL = `${BASE_PATH}/data/saas-incident-insights.json`;
 const INCIDENTS_CSV = `${BASE_PATH}/data/saas-incidents.csv`;
 const RULES_CSV = `${BASE_PATH}/data/saas-alert-rules.csv`;
 const CODE_URL =
@@ -17,7 +13,7 @@ const CODE_URL =
 
 const PALETTE = ["#3b82f6", "#22c55e", "#f59e0b", "#a855f7", "#ef4444", "#14b8a6"];
 
-interface Insights {
+export interface Insights {
   kpis: {
     incidents: number;
     alerts: number;
@@ -51,7 +47,7 @@ const fmt = (n: number) => n.toLocaleString("en-IN");
 function Panel({ title, sub, children }: { title: string; sub?: string; children: React.ReactNode }) {
   return (
     <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] p-5">
-      <h3 className="text-sm font-semibold text-[var(--color-text)]">{title}</h3>
+      <h2 className="text-sm font-semibold text-[var(--color-text)]">{title}</h2>
       {sub && <p className="mb-4 mt-0.5 text-xs text-[var(--color-muted)]">{sub}</p>}
       {!sub && <div className="mb-4" />}
       {children}
@@ -135,28 +131,7 @@ function Line({ points }: { points: { label: string; value: number }[] }) {
   );
 }
 
-export function IncidentAnalyticsShowcase() {
-  const [data, setData] = useState<Insights | null>(null);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    fetch(DATA_URL)
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then(setData)
-      .catch(() => setError(true));
-  }, []);
-
-  if (error) {
-    return <p className="mt-10 text-sm text-[var(--color-muted)]">Could not load the incident analytics data.</p>;
-  }
-  if (!data) {
-    return (
-      <div className="mt-10 flex items-center gap-2 text-sm text-[var(--color-muted)]">
-        <Loader2 size={16} className="animate-spin" /> Loading incident analytics…
-      </div>
-    );
-  }
-
+export function IncidentAnalyticsShowcase({ data }: { data: Insights }) {
   const k = data.kpis;
   const noisy = data.alert_rules.filter((r) => r.noise_pct >= 75);
 
@@ -260,7 +235,7 @@ export function IncidentAnalyticsShowcase() {
                     <td className="py-1.5 pr-3 font-mono text-[var(--color-text)]">{r.rule}</td>
                     <td className="pr-3 text-[var(--color-muted)]">{r.service}</td>
                     <td className="pr-3 text-right font-mono">{fmt(r.alerts_fired)}</td>
-                    <td className="pr-3 text-right font-mono text-[#ef4444]">{r.noise_pct}%</td>
+                    <td className="pr-3 text-right font-mono text-red-700 dark:text-red-400">{r.noise_pct}%</td>
                     <td className="text-right font-mono">{r.incidents_linked}</td>
                   </tr>
                 ))}

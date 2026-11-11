@@ -19,42 +19,48 @@ export function ExperienceCard({ experience, index }: Props) {
     >
       <div className="relative pl-8 before:absolute before:left-[11px] before:top-3 before:h-full before:w-px before:bg-[var(--color-border)] before:last:hidden">
         <div className="absolute left-0 top-1.5 h-6 w-6 rounded-full border-2 border-primary bg-[var(--color-bg)]" />
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="w-full text-left"
-        >
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h3 className="font-heading text-lg font-semibold">
-                {experience.role}
-              </h3>
-              <p className="text-primary">{experience.company}</p>
-              <div className="mt-1 flex items-center gap-3 text-sm text-[var(--color-muted)]">
-                <span>{experience.period}</span>
-                <span className="flex items-center gap-1">
-                  <MapPin size={12} />
-                  {experience.location}
-                </span>
-              </div>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {experience.technologies.map((tech) => (
-                  <span
-                    key={tech}
-                    className="rounded-md bg-primary/10 px-2 py-0.5 text-xs text-primary"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
+        {/* Header is plain content; only the chevron is a button, so the markup is valid and keyboard accessible. */}
+        <div className="flex cursor-pointer items-start justify-between gap-4" onClick={() => setIsOpen(!isOpen)}>
+          <div>
+            <h3 className="font-heading text-lg font-semibold">
+              {experience.role}
+            </h3>
+            <p className="text-primary">{experience.company}</p>
+            <div className="mt-1 flex items-center gap-3 text-sm text-[var(--color-muted)]">
+              <span>{experience.period}</span>
+              <span className="flex items-center gap-1">
+                <MapPin size={12} aria-hidden="true" />
+                {experience.location}
+              </span>
             </div>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {experience.technologies.map((tech) => (
+                <span
+                  key={tech}
+                  className="rounded-md bg-primary/10 px-2 py-0.5 text-xs text-primary"
+                >
+                  {tech}
+                </span>
+              ))}
+            </div>
+          </div>
+          <button
+            type="button"
+            aria-expanded={isOpen}
+            aria-label={`${isOpen ? "Hide" : "Show"} details for ${experience.role} at ${experience.company}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsOpen(!isOpen);
+            }}
+            className="mt-1 shrink-0 rounded-md p-1 text-[var(--color-muted)] hover:text-[var(--color-text)]"
+          >
             <ChevronDown
               size={18}
-              className={`mt-1 shrink-0 text-[var(--color-muted)] transition-transform duration-200 ${
-                isOpen ? "rotate-180" : ""
-              }`}
+              aria-hidden="true"
+              className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
             />
-          </div>
-        </button>
+          </button>
+        </div>
 
         <div
           className={`overflow-hidden transition-all duration-300 ${

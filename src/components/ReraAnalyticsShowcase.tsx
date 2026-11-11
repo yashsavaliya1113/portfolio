@@ -18,13 +18,10 @@ import {
 } from "lucide-react";
 import {
   COHORTS,
-  buildDataset,
-  decodeCsv,
   fmtCr,
   fmtInt,
   fmtPct,
   groupBy,
-  parseCsv,
   summarize,
   type Dataset,
   type Project,
@@ -183,12 +180,21 @@ export function ReraAnalyticsShowcase() {
   }, []);
 
   const ingest = useCallback(
-    (buf: ArrayBuffer, label: string) => {
-      const table = parseCsv(decodeCsv(buf));
-      if (table.length < 2) throw new Error("The file has no data rows.");
-      const ds = buildDataset(table);
-      if (!ds.columns.includes("projectCost") && !ds.columns.includes("total_est_cost_of_proj"))
-        throw new Error("This doesn't look like a GujRERA export (no project cost column).");
+    async (buf: ArrayBuffer, label: string) => {
+      // Heavy CSV parsing and cleaning runs in a Web Worker so the main thread stays free.
+      const ds = await new Promise<Dataset>((resolve, reject) => {
+        const worker = new Worker(new URL("../lib/rera.worker.ts", import.meta.url));
+        worker.onmessage = (e: MessageEvent<{ ok: boolean; ds?: Dataset; error?: string }>) => {
+          worker.terminate();
+          if (e.data.ok && e.data.ds) resolve(e.data.ds);
+          else reject(new Error(e.data.error || "Could not process the file."));
+        };
+        worker.onerror = () => {
+          worker.terminate();
+          reject(new Error("The data worker failed to start."));
+        };
+        worker.postMessage(buf, [buf]);
+      });
       setData(ds);
       setSource(label);
       setPage(0);
@@ -203,7 +209,7 @@ export function ReraAnalyticsShowcase() {
     try {
       const res = await fetch(`${DATA_URL}?t=${Date.now()}`, { cache: "no-store" });
       if (!res.ok) throw new Error(`Could not fetch dataset (HTTP ${res.status}).`);
-      ingest(await res.arrayBuffer(), "ahmedabad-rera.csv");
+      await ingest(await res.arrayBuffer(), "ahmedabad-rera.csv");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load data.");
     } finally {
@@ -223,7 +229,7 @@ export function ReraAnalyticsShowcase() {
     setLoading(true);
     setError("");
     try {
-      ingest(await file.arrayBuffer(), file.name);
+      await ingest(await file.arrayBuffer(), file.name);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not read file.");
     } finally {
@@ -398,12 +404,12 @@ export function ReraAnalyticsShowcase() {
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <Kpi label="Rows ingested" value={fmtInt(q.total)} note={`${fmtInt(q.duplicatesRemoved)} duplicates removed`} />
             <Kpi label="Completeness" value={`${q.completeness.toFixed(2)}%`} note="name · developer · cost · dates" tone="text-success" />
-            <Kpi label="Missing cost" value={fmtInt(q.missingCost)} note="excluded from cost totals" tone={q.missingCost ? "text-amber-400" : "text-success"} />
+            <Kpi label="Missing cost" value={fmtInt(q.missingCost)} note="excluded from cost totals" tone={q.missingCost ? "text-amber-700 dark:text-amber-400" : "text-success"} />
             <Kpi
               label="Date issues"
               value={fmtInt(q.missingDates + q.invalidDateRange)}
               note={`${q.missingDates} missing · ${q.invalidDateRange} end < start`}
-              tone={q.missingDates + q.invalidDateRange ? "text-amber-400" : "text-success"}
+              tone={q.missingDates + q.invalidDateRange ? "text-amber-700 dark:text-amber-400" : "text-success"}
             />
           </div>
 
@@ -434,7 +440,7 @@ export function ReraAnalyticsShowcase() {
                       ) : p.costCr != null ? (
                         <span className="font-semibold">₹{p.costCr.toFixed(2)} Cr</span>
                       ) : (
-                        <span className="text-amber-400">missing</span>
+                        <span className="text-amber-700 dark:text-amber-400">missing</span>
                       )}
                     </td>
                     <td className="p-3 font-mono">
@@ -447,7 +453,7 @@ export function ReraAnalyticsShowcase() {
                           {p.durationYears.toFixed(1)} yrs ({fmtInt(p.durationDays as number)}d)
                         </span>
                       ) : (
-                        <span className="text-amber-400">invalid</span>
+                        <span className="text-amber-700 dark:text-amber-400">invalid</span>
                       )}
                     </td>
                     <td className="p-3">
@@ -481,7 +487,7 @@ export function ReraAnalyticsShowcase() {
               label="Cost variance"
               value={fmtPct(sum.variancePct)}
               note={`${sum.varianceCr > 0 ? "+" : ""}${fmtCr(sum.varianceCr)} · ${fmtInt(sum.varianceCount)} projects`}
-              tone={sum.variancePct <= 0 ? "text-success" : "text-amber-400"}
+              tone={sum.variancePct <= 0 ? "text-success" : "text-amber-700 dark:text-amber-400"}
             />
           </div>
 
@@ -518,7 +524,7 @@ export function ReraAnalyticsShowcase() {
                     <div key={t.label}>
                       <div className="mb-1 flex justify-between text-xs">
                         <span className="font-medium text-[var(--color-text)]">{t.label}</span>
-                        <span className={`font-mono ${v <= 0 ? "text-success" : "text-amber-400"}`}>
+                        <span className={`font-mono ${v <= 0 ? "text-success" : "text-amber-700 dark:text-amber-400"}`}>
                           {fmtPct(v)} ({t.varianceCr > 0 ? "+" : ""}
                           {fmtCr(t.varianceCr)})
                         </span>
@@ -620,7 +626,7 @@ export function ReraAnalyticsShowcase() {
                       <td className="p-3">{p.cohort ? <Badge>{p.cohort}</Badge> : "—"}</td>
                       <td className="p-3 text-right font-mono">
                         {p.variancePct != null ? (
-                          <span className={p.variancePct <= 0 ? "text-success" : "text-amber-400"}>{fmtPct(p.variancePct)}</span>
+                          <span className={p.variancePct <= 0 ? "text-success" : "text-amber-700 dark:text-amber-400"}>{fmtPct(p.variancePct)}</span>
                         ) : (
                           <span className="text-[var(--color-muted)]">—</span>
                         )}
@@ -664,7 +670,7 @@ export function ReraAnalyticsShowcase() {
 }
 
 function Raw({ children }: { children: React.ReactNode }) {
-  return <span className="rounded bg-amber-400/10 px-1.5 py-0.5 text-amber-400">{children}</span>;
+  return <span className="rounded bg-amber-400/10 px-1.5 py-0.5 text-amber-700 dark:text-amber-400">{children}</span>;
 }
 
 function Badge({ children }: { children: React.ReactNode }) {

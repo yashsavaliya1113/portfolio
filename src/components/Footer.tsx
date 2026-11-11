@@ -18,9 +18,9 @@ export function Footer() {
             </p>
           </div>
           <div>
-            <h3 className="mb-4 text-xs font-medium uppercase tracking-wider text-[var(--color-muted)]">
+            <h2 className="mb-4 text-xs font-medium uppercase tracking-wider text-[var(--color-muted)]">
               Navigation
-            </h3>
+            </h2>
             <ul className="space-y-2.5">
               {navigation.map((item) => (
                 <li key={item.href}>
@@ -35,9 +35,9 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h3 className="mb-4 text-xs font-medium uppercase tracking-wider text-[var(--color-muted)]">
+            <h2 className="mb-4 text-xs font-medium uppercase tracking-wider text-[var(--color-muted)]">
               Connect
-            </h3>
+            </h2>
             <ul className="space-y-2.5">
               {socialLinks.map((link) => (
                 <li key={link.name}>
@@ -54,9 +54,9 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h3 className="mb-4 text-xs font-medium uppercase tracking-wider text-[var(--color-muted)]">
+            <h2 className="mb-4 text-xs font-medium uppercase tracking-wider text-[var(--color-muted)]">
               Contact
-            </h3>
+            </h2>
             <ul className="space-y-2.5">
               <li>
                 <a

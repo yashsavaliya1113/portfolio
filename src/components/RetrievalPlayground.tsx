@@ -108,7 +108,7 @@ export function RetrievalPlayground({ chunks }: { chunks: BlogChunk[] }) {
             <div className="flex items-center justify-between gap-3">
               <Link
                 href={`/blog/${chunk.postSlug}/${chunk.anchor ? `#${chunk.anchor}` : ""}`}
-                className="font-heading text-sm font-semibold text-primary hover:underline"
+                className="font-heading text-sm font-semibold text-primary underline underline-offset-2 hover:no-underline"
               >
                 {chunk.heading}
               </Link>

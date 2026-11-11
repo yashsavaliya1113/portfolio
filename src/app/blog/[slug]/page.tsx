@@ -109,7 +109,7 @@ export default async function BlogPostPage({ params }: Props) {
             <p className="mt-4 text-lg text-[var(--color-muted)]">{post.description}</p>
             <p className="mt-4 text-sm">
               By{" "}
-              <Link href="/#about" className="font-medium text-primary hover:underline" rel="author">
+              <Link href="/#about" className="font-medium text-primary underline underline-offset-2 hover:no-underline" rel="author">
                 {profile.name}
               </Link>
               , Full Stack .NET Developer and Data Analyst
@@ -149,7 +149,7 @@ export default async function BlogPostPage({ params }: Props) {
               <ul className="mt-4 list-disc space-y-1.5 pl-5 text-sm">
                 {post.references.map((r) => (
                   <li key={r.url}>
-                    <a href={r.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                    <a href={r.url} target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2 hover:no-underline">
                       {r.title}
                     </a>
                   </li>
@@ -165,7 +165,7 @@ export default async function BlogPostPage({ params }: Props) {
             <ul className="mt-4 space-y-2 text-sm">
               {relatedProjects.map((p) => (
                 <li key={p.slug}>
-                  <Link href={`/projects/${p.slug}/`} className="font-medium text-primary hover:underline">
+                  <Link href={`/projects/${p.slug}/`} className="font-medium text-primary underline underline-offset-2 hover:no-underline">
                     {p.title}
                   </Link>
                   <span className="text-[var(--color-muted)]"> — {p.description}</span>
@@ -198,11 +198,11 @@ export default async function BlogPostPage({ params }: Props) {
           <p className="mt-2 text-sm text-[var(--color-muted)]">
             {profile.name} is a Full Stack .NET Developer and Data Analyst in Ahmedabad, India. He builds SaaS
             platforms with ASP.NET Core, Angular and Azure at iTechOps.{" "}
-            <Link href="/#about" className="text-primary hover:underline">More about Yash</Link>
+            <Link href="/#about" className="text-primary underline underline-offset-2 hover:no-underline">More about Yash</Link>
             {" · "}
-            <Link href="/#projects" className="text-primary hover:underline">Projects</Link>
+            <Link href="/#projects" className="text-primary underline underline-offset-2 hover:no-underline">Projects</Link>
             {" · "}
-            <Link href="/ai-lab/" className="text-primary hover:underline">AI Lab</Link>
+            <Link href="/ai-lab/" className="text-primary underline underline-offset-2 hover:no-underline">AI Lab</Link>
           </p>
         </aside>
       </div>

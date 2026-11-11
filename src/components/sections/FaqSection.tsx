@@ -17,11 +17,11 @@ export function FaqSection() {
                   <span className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
                     {f.links.map((l) =>
                       l.href.startsWith("http") ? (
-                        <a key={l.href} href={l.href} target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline">
+                        <a key={l.href} href={l.href} target="_blank" rel="noopener noreferrer" className="font-medium text-primary underline underline-offset-2 hover:no-underline">
                           {l.label}
                         </a>
                       ) : (
-                        <Link key={l.href} href={l.href} className="font-medium text-primary hover:underline">
+                        <Link key={l.href} href={l.href} className="font-medium text-primary underline underline-offset-2 hover:no-underline">
                           {l.label}
                         </Link>
                       ),

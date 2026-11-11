@@ -24,7 +24,7 @@ export function AILabPreviewSection() {
               </p>
               <Link
                 href="/ai-lab/"
-                className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary underline underline-offset-2 hover:no-underline"
               >
                 Open the AI Lab
                 <ArrowRight size={14} aria-hidden="true" />
