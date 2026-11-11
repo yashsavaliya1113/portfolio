@@ -1,0 +1,203 @@
+---
+title: "Entity Framework Core Performance: Fixing N+1 Queries and Tracking Overhead"
+seoTitle: "EF Core Performance: N+1 Queries and Tracking"
+description: "Diagnose and fix the two most common EF Core performance problems in ASP.NET Core APIs: N+1 queries and unnecessary change tracking."
+date: "2026-11-11"
+modified: "2026-11-11"
+tags: ["EF Core", "ASP.NET Core", "C#", "Performance", "SQL"]
+category: "Engineering"
+published: true
+relatedProjects: ["incident-management-platform", "white-label-assessment-platform"]
+relatedPosts: ["clean-maintainable-aspnet-core-web-api", "sql-query-optimization-techniques"]
+references:
+  - title: "Efficient querying with EF Core (Microsoft Learn)"
+    url: "https://learn.microsoft.com/ef/core/performance/efficient-querying"
+  - title: "Tracking vs. no-tracking queries (Microsoft Learn)"
+    url: "https://learn.microsoft.com/ef/core/querying/tracking"
+  - title: "Loading related data (Microsoft Learn)"
+    url: "https://learn.microsoft.com/ef/core/querying/related-data/"
+  - title: "EF Core performance considerations (Microsoft Learn)"
+    url: "https://learn.microsoft.com/ef/core/performance/"
+  - title: "ExecuteUpdate and ExecuteDelete (Microsoft Learn)"
+    url: "https://learn.microsoft.com/ef/core/saving/execute-insert-update-delete"
+---
+
+An EF Core query that takes 3 ms on a laptop with 200 rows can take 900 ms in production with 200,000. The database is usually not the culprit first; the way the application talks to it is. Two patterns account for a large share of those regressions: a query issued once per row (N+1) and change tracking applied to data nobody intends to modify.
+
+This article uses an incident management domain — incidents, services, comments and alerts — because it has the mix that exposes both problems: parent rows with several children, read-heavy list screens, and occasional bulk updates. The examples target EF Core 8 and later unless noted. Check the linked documentation for the exact API surface in your version.
+
+## Start by counting queries, not timing them
+
+Before changing code, make the queries visible. EF Core logs every command it sends at the `Information` level under `Microsoft.EntityFrameworkCore.Database.Command`:
+
+```json
+{
+  "Logging": {
+    "LogLevel": {
+      "Microsoft.EntityFrameworkCore.Database.Command": "Information"
+    }
+  }
+}
+```
+
+In development you can also enable `EnableSensitiveDataLogging()` and `EnableDetailedErrors()` on the context options, which show parameter values and clearer errors. Keep both out of production. For a single query, `ToQueryString()` prints the SQL without executing it:
+
+```csharp
+var sql = db.Incidents
+    .Where(i => i.TenantId == tenantId && i.Status != IncidentStatus.Closed)
+    .ToQueryString();
+```
+
+The goal is simple: for a list screen, you want a small, predictable number of round trips that does not grow with the number of rows returned. If a page issues one query per incident, the page is fine at ten rows and unusable at a thousand.
+
+## The N+1 problem and the three ways out
+
+N+1 means one query to load the parents, then one additional query for each parent to load something related. It usually appears through lazy loading, where a navigation property loads on first access:
+
+```csharp
+// With lazy-loading proxies enabled, this loop sends 1 + N queries.
+var incidents = await db.Incidents
+    .Where(i => i.TenantId == tenantId)
+    .ToListAsync(ct);
+
+foreach (var incident in incidents)
+{
+    // First touch of Service triggers a query for this incident's service.
+    Console.WriteLine($"{incident.Id}: {incident.Service.Name}");
+}
+```
+
+Lazy loading is convenient in small tools, but it makes database work invisible. A mapping change or a new property in a view can silently add hundreds of queries. If you use it, enable it deliberately with `UseLazyLoadingProxies()` and watch the command log. For a web API, explicit loading is easier to reason about.
+
+**Option 1: eager loading.** `Include` and `ThenInclude` fetch related data in the same query:
+
+```csharp
+var incidents = await db.Incidents
+    .AsNoTracking()
+    .Where(i => i.TenantId == tenantId && i.Status != IncidentStatus.Closed)
+    .Include(i => i.Service)
+    .Include(i => i.Comments)
+    .OrderByDescending(i => i.OpenedAt)
+    .Take(50)
+    .ToListAsync(ct);
+```
+
+This removes the per-row queries, but including two collections in one query multiplies rows: each incident row repeats for every comment. That is the cartesian explosion. If both collections are genuinely needed, `AsSplitQuery()` issues one query per collection instead, at the cost of extra round trips and a weaker consistency guarantee across the queries. Measure both; the right choice depends on row counts and how much of each collection you need.
+
+**Option 2: projection.** Most list screens do not need entities at all. A DTO projection selects exactly the columns the screen uses and lets the database do the joins and counts:
+
+```csharp
+var rows = await db.Incidents
+    .AsNoTracking()
+    .Where(i => i.TenantId == tenantId && i.Status != IncidentStatus.Closed)
+    .OrderByDescending(i => i.OpenedAt)
+    .Take(50)
+    .Select(i => new IncidentRow(
+        i.Id,
+        i.Title,
+        i.Service.Name,
+        i.Comments.Count,
+        i.OpenedAt))
+    .ToListAsync(ct);
+```
+
+This is usually the fastest and smallest option: one query, no tracking, no entity graph, and no over-fetching. Note that `Include` is ignored once you project, because the projection already states what to select.
+
+**Option 3: a second, focused query.** When the first query returns a page of incidents and you need full comments only for those incidents, load the page first, collect the IDs, then query comments with `Where(c => incidentIds.Contains(c.IncidentId))`. Two queries, predictable size, no row multiplication. This is often clearer than a split query when the child set is large and only partly needed.
+
+> **A pitfall worth knowing:** `AsNoTracking()` with `Include` can materialize the same service as separate instances for each incident. Reference equality then fails, and a serialized object graph can contain duplicate data. If identity matters, use `AsNoTrackingWithIdentityResolution()`, which keeps a small identity map for the duration of the query. Do not add it everywhere; it is only useful when the same related row appears more than once in the result.
+
+## Change tracking: useful, but not free
+
+Every tracked entity gets an entry in the `DbContext` change tracker. EF Core stores its original values, watches for modifications, and runs `DetectChanges` before `SaveChanges` to work out what to write. That is exactly what you want when you load an incident, edit two fields, and save. It is wasted work when you load a hundred rows only to render them.
+
+```csharp
+// Read-only list: no tracking needed.
+var services = await db.Services
+    .AsNoTracking()
+    .Where(s => s.TenantId == tenantId)
+    .OrderBy(s => s.Name)
+    .ToListAsync(ct);
+```
+
+For APIs that mostly read, set the default at the context level and opt back in for writes:
+
+```csharp
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options
+        .UseSqlServer(connectionString)
+        .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
+```
+
+Then use `AsTracking()` on the queries that load entities for modification. This makes the intent explicit and prevents a forgotten `AsNoTracking()` on a read path from slowly filling the tracker.
+
+A tracked query also does identity resolution by default: if the same service appears in twenty incidents, EF Core returns the same instance each time. That is a feature for updates and a cost for reads. `AsNoTracking` skips both the snapshotting and the identity map, which is why it can reduce memory and CPU on large result sets, not just SQL work.
+
+One more tracking detail matters for updates. `DbSet.Update(entity)` marks every property as modified, even the ones that did not change, so it writes all columns and can overwrite values another request changed in the meantime:
+
+```csharp
+// Marks every column modified: more SQL, and lost-update risk.
+db.Incidents.Update(incidentFromRequest);
+await db.SaveChangesAsync(ct);
+```
+
+Prefer loading the row you are allowed to change, applying only the permitted fields, and saving. That keeps the generated `UPDATE` small and the concurrency behavior honest. For genuinely disconnected data, attach the entity and mark only the changed properties, or use a concurrency token so conflicting writes fail instead of silently winning.
+
+## Bulk operations should not go through the tracker
+
+EF Core 7 added `ExecuteUpdateAsync` and `ExecuteDeleteAsync`, which translate directly to a single `UPDATE` or `DELETE` statement:
+
+```csharp
+var closed = await db.Incidents
+    .Where(i => i.TenantId == tenantId
+                && i.Status != IncidentStatus.Closed
+                && i.OpenedAt < cutoff)
+    .ExecuteUpdateAsync(setters => setters
+        .SetProperty(i => i.Status, IncidentStatus.Closed)
+        .SetProperty(i => i.ClosedAt, DateTime.UtcNow), ct);
+```
+
+Compare that with loading every matching incident, changing it in a loop, and calling `SaveChanges`. The loop produces a tracked entity per row and a batch of updates; `ExecuteUpdate` produces one statement. The trade-off is that it bypasses the change tracker and the `SaveChanges` pipeline, so tracked copies in the same context are not refreshed and save interceptors do not run. Use it for maintenance jobs, archival and status sweeps where those guarantees are not needed.
+
+For normal inserts, add the whole set and call `SaveChanges` once rather than once per row. The SQL Server provider batches commands (configurable with `MaxBatchSize`), so a single `SaveChanges` is usually far cheaper than a loop of them. Each `SaveChanges` is also its own transaction, which matters for consistency as much as speed.
+
+## Stop pulling rows into memory to filter them
+
+A query that filters after materialization reads the whole table and then discards most of it:
+
+```csharp
+// Bad: loads every incident for the tenant, filters in .NET.
+var incidents = await db.Incidents
+    .Where(i => i.TenantId == tenantId)
+    .ToListAsync(ct);
+
+var overdue = incidents.Where(i => i.SlaDueAt < now && i.ClosedAt == null).ToList();
+```
+
+Move the predicate into the query so the database can use an index and return only matching rows:
+
+```csharp
+var overdue = await db.Incidents
+    .AsNoTracking()
+    .Where(i => i.TenantId == tenantId && i.SlaDueAt < now && i.ClosedAt == null)
+    .ToListAsync(ct);
+```
+
+The same rule applies to `AsEnumerable()` in the middle of a query, and to helper methods that EF Core cannot translate. Since EF Core 3, untranslatable expressions throw instead of silently running on the client, except in the final projection. That is a good default, but a custom method called inside `Where` still fails at runtime, so keep predicates to expressions the provider understands.
+
+Large `Contains` lists deserve a mention. Recent EF Core versions translate parameterized collections more efficiently than a long `IN` list, but the exact SQL depends on the provider and version. If you are passing thousands of IDs, check the generated SQL and consider a join against a table-valued parameter or a temporary table instead. For deep pagination, `Skip` with a large offset also reads and discards rows; keyset pagination, described in [SQL query optimization](/blog/sql-query-optimization-techniques/), stays fast at any page.
+
+## A short checklist
+
+1. Turn on command logging in development and count queries per request.
+2. Remove lazy loading from API request paths, or watch it closely.
+3. Project to DTOs for list screens; include entities only when you need the graph.
+4. Use `AsNoTracking` for reads and `AsTracking` only for rows you will modify.
+5. Use `AsSplitQuery` when including multiple collections, and measure the trade-off.
+6. Use `ExecuteUpdate` and `ExecuteDelete` for bulk work, and remember they bypass the tracker.
+7. Keep filters in SQL, never after `ToList()` or `AsEnumerable()`.
+8. Batch writes into one `SaveChanges`, and index the columns your predicates use.
+
+None of this replaces database tuning. A good EF Core query can still be slow if the underlying table lacks an index or the statistics are stale; the [SQL query optimization guide](/blog/sql-query-optimization-techniques/) covers how to read a plan and fix that side. Keeping queries in one place, as described in the [clean ASP.NET Core API article](/blog/clean-maintainable-aspnet-core-web-api/), also makes them easier to inspect and change.
+
+The [incident management platform](/projects/incident-management-platform/) is the kind of application where these patterns matter: a read-heavy status page and dashboard on top of EF Core and Azure SQL, with incident lists, counts and tenant filters that grow with usage. If you are building something similar, start with the query log, fix the N+1 shape, and only then reach for caching or a bigger database.

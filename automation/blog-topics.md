@@ -5,7 +5,7 @@ Edit this list any time: reorder, add topics, or delete ones you do not want. Ke
 
 Format: `- [ ] Working title | primary keyword | related project slug(s)`
 
-- [ ] Entity Framework Core performance: fixing N+1 queries and tracking overhead | EF Core performance | incident-management-platform
+- [x] Entity Framework Core performance: fixing N+1 queries and tracking overhead | EF Core performance | incident-management-platform -> ef-core-performance-n-plus-one-queries
 - [ ] SQL window functions explained with real examples (ROW_NUMBER, RANK, LAG) | SQL window functions | saas-reliability-incident-intelligence
 - [ ] Multi-tenant data isolation in ASP.NET Core with EF Core query filters | multi-tenant ASP.NET Core | white-label-assessment-platform
 - [ ] The outbox pattern in .NET: reliable event delivery with RabbitMQ | outbox pattern .NET | payment-gateway
