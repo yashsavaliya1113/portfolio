@@ -146,6 +146,47 @@ for (const f of ["resume-dotnet-developer.pdf", "resume-data-analyst.pdf", "resu
   record("robots", `Resume PDF present: ${f}`, fs.existsSync(fp) && fs.readFileSync(fp).subarray(0, 4).toString() === "%PDF");
 }
 
+// ---- GEO: identity facts must be consistent, visible as text and machine-readable ------------------
+const decodeEntities = (t) =>
+  t.replace(/&#x27;|&#39;|&apos;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#x2F;/g, "/");
+const visibleText = (html) =>
+  decodeEntities(html.replace(/<script[\s\S]*?<\/script>/gi, " ").replace(/<style[\s\S]*?<\/style>/gi, " ").replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ");
+
+const llmsText = fs.existsSync(path.join(outDir, "llms.txt")) ? fs.readFileSync(path.join(outDir, "llms.txt"), "utf8") : "";
+const contentUrls = locs.filter((l) => /\/(blog|projects)\/[^/]+\/$/.test(l));
+const missingFromLlms = contentUrls.filter((u) => !llmsText.includes(u));
+record("geo", "llms.txt lists every article and project in the sitemap", missingFromLlms.length === 0, missingFromLlms.map((u) => u.replace(SITE, "")).join(", "));
+
+const homeHtml = pages.get(`${SITE}/`) ?? "";
+const homeText = visibleText(homeHtml);
+record("geo", "Home states name, role and location in visible text", ["Yash Savaliya", "Full Stack .NET Developer", "Data Analyst", "Ahmedabad"].every((t) => homeText.includes(t)));
+
+const homeBlocks = [...homeHtml.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].flatMap((m) => {
+  try {
+    const j = JSON.parse(m[1]);
+    return Array.isArray(j) ? j : [j];
+  } catch {
+    return [];
+  }
+});
+const faq = homeBlocks.find((o) => o["@type"] === "FAQPage");
+const faqMissing = (faq?.mainEntity || []).filter((q) => !homeText.includes(decodeEntities(q.acceptedAnswer?.text || "").replace(/\s+/g, " ")));
+record("geo", "Every FAQ answer in the FAQPage JSON-LD is also visible on the page", !!faq && faqMissing.length === 0, faqMissing.map((q) => q.name).join(" | "));
+
+const person = homeBlocks.find((o) => o["@type"] === "Person");
+record(
+  "geo",
+  "Person JSON-LD has name, jobTitle, address, 5+ knowsAbout and 2+ sameAs",
+  !!person && !!person.name && !!person.jobTitle && !!person.address && (person.knowsAbout || []).length >= 5 && (person.sameAs || []).length >= 2,
+  person ? "" : "no Person object",
+);
+
+for (const [loc, html] of pages) {
+  if (/\/blog\/[^/]+\/$/.test(loc)) {
+    record("geo", `Article shows author and dates as text: ${loc}`, /rel="author"/.test(html) && /<time datetime="\d{4}-\d{2}-\d{2}"/i.test(html) && /Published/.test(html));
+  }
+}
+
 // ---- Performance guards ---------------------------------------------------------------
 const cssDir = path.join(outDir, "_next", "static", "css");
 const cssSize = fs.existsSync(cssDir) ? fs.readdirSync(cssDir).reduce((a, f) => a + fs.statSync(path.join(cssDir, f)).size, 0) : 0;
