@@ -27,10 +27,7 @@ export function ContactSection() {
         <SectionHeading title="Contact" subtitle="Let's build something together." />
         <div className="grid gap-12 lg:grid-cols-2 lg:items-start">
           <div className="relative z-20 animate-fade-up" style={{ animationFillMode: "both" }}>
-            <h3 className="font-heading text-3xl font-bold tracking-tight">
-              Let&apos;s work together
-            </h3>
-            <p className="mt-4 text-[var(--color-muted)]">
+            <p className="text-[var(--color-muted)]">
               I&apos;m always open to discussing new projects, creative ideas, or
               opportunities to be part of your vision.
             </p>
