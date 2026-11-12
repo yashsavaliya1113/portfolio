@@ -3,13 +3,15 @@ title: "Building a Clean and Maintainable ASP.NET Core Web API: Architecture, De
 seoTitle: "Clean ASP.NET Core Web API: Architecture and DI"
 description: "A practical guide to a clean ASP.NET Core Web API: thin controllers, services, DI lifetimes, when to use repositories, ProblemDetails errors and validation."
 date: "2026-11-11"
-modified: "2026-11-11"
+modified: "2026-11-12"
 tags: ["ASP.NET Core", "C#", "Web API", "Dependency Injection", "Architecture"]
 category: "Engineering"
 published: true
 relatedProjects: ["payment-gateway", "incident-management-platform"]
 relatedPosts: ["sql-query-optimization-techniques", "deploying-applications-on-azure-guide"]
 references:
+  - title: "Source code for this article: aspnetcore-clean-api-sample (GitHub)"
+    url: "https://github.com/yashsavaliya1113/aspnetcore-clean-api-sample"
   - title: "Create web APIs with ASP.NET Core (Microsoft Learn)"
     url: "https://learn.microsoft.com/aspnet/core/web-api/"
   - title: "Dependency injection in ASP.NET Core (Microsoft Learn)"
@@ -22,7 +24,7 @@ references:
 
 Most ASP.NET Core APIs start clean and become hard to change around the second year: controllers that talk to the database, validation scattered across layers, and exceptions turned into `500` responses by accident. None of that needs a heavyweight architecture to fix. A few consistent decisions are enough.
 
-This article walks through one small but complete API (create and fetch a product) and explains each decision. Everything below was compiled and run on .NET 10; the same code works on .NET 8.
+This article walks through one small but complete API (create and fetch a product) and explains each decision. The full, runnable code is on GitHub: [aspnetcore-clean-api-sample](https://github.com/yashsavaliya1113/aspnetcore-clean-api-sample), with integration tests for the 201, 400 and 404 responses shown below. Everything here was compiled and run on .NET 10 (the repository's CI runs the tests on Linux). The APIs used have been available since .NET 8, but I have only run it on .NET 10.
 
 ## The shape of the solution
 

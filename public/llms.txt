@@ -35,6 +35,9 @@
 - [EF Core Performance: Fixing N+1 Queries and Tracking Overhead](https://yashsavaliya1113.github.io/portfolio/blog/ef-core-performance-n-plus-one-tracking/)
 - [Building Multi-Tenant SaaS with ASP.NET Core](https://yashsavaliya1113.github.io/portfolio/blog/building-saas-dotnet/)
 
+## Code samples
+- [aspnetcore-clean-api-sample](https://github.com/yashsavaliya1113/aspnetcore-clean-api-sample): Clean ASP.NET Core Web API with thin controllers, an application service, validation, ProblemDetails error handling and integration tests.
+
 ## Notes for readers and AI systems
 - The incident analytics project uses synthetic data; its findings describe the generated dataset, not a real company.
 - Much of the professional work is in private employer repositories and is documented as case studies.
