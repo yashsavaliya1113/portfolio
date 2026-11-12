@@ -32,6 +32,7 @@
 - [Practical Python Automation: Turning Repetitive Tasks into Efficient Workflows](https://yashsavaliya1113.github.io/portfolio/blog/practical-python-automation-pandas/)
 - [Deploying and Managing Applications on Microsoft Azure](https://yashsavaliya1113.github.io/portfolio/blog/deploying-applications-on-azure-guide/)
 - [How AI Is Changing .NET Development](https://yashsavaliya1113.github.io/portfolio/blog/how-ai-is-changing-dotnet-development/)
+- [EF Core Performance: Fixing N+1 Queries and Tracking Overhead](https://yashsavaliya1113.github.io/portfolio/blog/ef-core-performance-n-plus-one-tracking/)
 - [Building Multi-Tenant SaaS with ASP.NET Core](https://yashsavaliya1113.github.io/portfolio/blog/building-saas-dotnet/)
 
 ## Notes for readers and AI systems

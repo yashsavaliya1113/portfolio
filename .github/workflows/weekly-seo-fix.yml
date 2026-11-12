@@ -1,0 +1,86 @@
+name: Weekly SEO and GEO fixer (OpenCode)
+
+# Every Monday the site is built and put through a quality gate: the repo audit (metadata, JSON-LD, sitemap, links, GEO facts),
+# Lighthouse (accessibility, best practices and SEO must be 100), axe-core and the W3C HTML validator.
+# If anything fails, OpenCode (its own models, never Claude) edits the source to fix it. The fix is only kept when the build
+# passes, the issue count drops and no new issue appears, and it is delivered as a DRAFT pull request for you to review.
+# Nothing is pushed to main. If the site is clean, no model is called. Setup: docs/automation.md
+
+on:
+  schedule:
+    - cron: "30 5 * * 1" # Mondays 05:30 UTC, after the SEO watch (05:00) and the blog draft (04:30)
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Branch to check and fix (default: main)"
+        required: false
+        default: main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: weekly-seo-fix
+  cancel-in-progress: false
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+      OPENCODE_MODEL: ${{ vars.OPENCODE_MODEL || 'opencode/deepseek-v4.1-flash-free' }}
+      PW_CHANNEL: chrome # use the Chrome already installed on the runner
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || 'main' }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install OpenCode
+        run: npm install -g ${{ vars.OPENCODE_PACKAGE || '@opencode/cli@2.2.7' }}
+
+      - name: Check, fix and re-check
+        id: fix
+        run: node scripts/seo-fix-loop.mjs
+
+      - name: Show the result on the run summary
+        if: always()
+        run: |
+          [ -f seo-fix-summary.md ] && cat seo-fix-summary.md >> "$GITHUB_STEP_SUMMARY" || true
+          [ -f quality/report.md ] && { echo; cat quality/report.md; } >> "$GITHUB_STEP_SUMMARY" || true
+
+      - name: Keep the reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: seo-fix-reports
+          path: |
+            quality/report.md
+            quality/issues.json
+            seo-fix-summary.md
+          retention-days: 30
+          if-no-files-found: ignore
+
+      - name: Open a draft pull request with the fixes
+        if: steps.fix.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          add-paths: |
+            src/
+            content/blog/
+            public/llms.txt
+            public/robots.txt
+          branch: auto/seo-fix-${{ github.run_id }}
+          base: ${{ inputs.ref || 'main' }}
+          draft: true
+          commit-message: "fix(seo): automated SEO/GEO/accessibility fixes (OpenCode)"
+          title: "Automated SEO/GEO fixes: ${{ steps.fix.outputs.before }} issues to ${{ steps.fix.outputs.after }}"
+          body-path: seo-fix-summary.md

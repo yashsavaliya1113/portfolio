@@ -13,7 +13,9 @@
     "ping-search": "node scripts/ping-search-engines.mjs",
     "blog:check": "node scripts/check-blog-post.mjs",
     "blog:draft": "node scripts/blog-draft.mjs",
-    "seo:watch": "node scripts/seo-watch.mjs"
+    "seo:watch": "node scripts/seo-watch.mjs",
+    "quality": "node scripts/quality-gate.mjs",
+    "seo:fix": "node scripts/seo-fix-loop.mjs"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.3.2",
@@ -32,12 +34,14 @@
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.20",
+    "axe-core": "^4.14.0",
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.3.8",
     "gray-matter": "^4.0.3",
     "marked": "^15.0.0",
     "playwright": "^1.65.0",
     "reading-time": "^1.5.0",
-    "sharp": "^0.35.5"
+    "sharp": "^0.35.5",
+    "vnu-jar": "^26.11.9"
   }
 }

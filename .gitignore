@@ -10,3 +10,7 @@ lighthouse*.json
 
 # OpenCode local state
 .opencode/
+
+# SEO fixer / quality gate output
+quality/
+seo-fix-summary.md
