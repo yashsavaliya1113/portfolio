@@ -37,7 +37,7 @@ export default function ResumePage() {
     <div className="pt-24 pb-20">
       <JsonLd data={jsonLd} />
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
-        <div className="flex items-center justify-between mb-8 animate-fade-up" style={{ animationFillMode: "both" }}>
+        <div className="relative z-30 mb-8 flex items-center justify-between animate-fade-up" style={{ animationFillMode: "both" }}>
           <h1 className="font-heading text-3xl font-bold tracking-tight">Resume</h1>
           <ResumeDownload label="Download PDF" variant="primary" align="right" />
         </div>

@@ -2,6 +2,7 @@ import { siteConfig } from "@/config/site";
 import { navigation } from "@/config/navigation";
 import { socialLinks } from "@/config/social";
 import Link from "next/link";
+import { Logo } from "@/components/Logo";
 
 export function Footer() {
   return (
@@ -9,10 +10,7 @@ export function Footer() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4">
           <div className="sm:col-span-2 lg:col-span-1">
-            <Link href="/" className="font-heading text-lg font-semibold tracking-tight">
-              {siteConfig.name.split(" ")[0]}
-              <span className="text-primary">.</span>
-            </Link>
+            <Logo />
             <p className="mt-2 max-w-xs text-sm text-[var(--color-muted)] leading-relaxed">
               Full Stack .NET Developer and Data Analyst in Ahmedabad, India. Building SaaS applications with ASP.NET Core, Angular and Azure, and analyzing data with SQL, Python and Excel.
             </p>
