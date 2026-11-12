@@ -5,6 +5,7 @@ import { Menu, X, FileDown } from "lucide-react";
 import Link from "next/link";
 import { ThemeToggle } from "./ThemeToggle";
 import { ResumeDownload } from "./ResumeDownload";
+import { Logo } from "./Logo";
 import { resumes } from "@/config/resumes";
 import { navigation } from "@/config/navigation";
 import { profile } from "@/config/profile";
@@ -22,13 +23,7 @@ export function Navbar() {
         style={{ width: `${progress * 100}%` }}
       />
       <nav className="relative mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link
-          href="/"
-          className="font-heading text-lg font-semibold tracking-tight"
-        >
-          {profile.name.split(" ")[0]}
-          <span className="text-primary">.</span>
-        </Link>
+        <Logo />
 
         <div className="hidden items-center gap-1 md:flex">
           {navigation.map((item) => (

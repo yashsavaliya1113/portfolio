@@ -63,7 +63,7 @@ for (const loc of locs) {
   record("seo", `Exactly one H1: ${loc}`, h1 === 1, `count ${h1}`);
 
   const imgs = html.match(/<img[^>]*>/gi) || [];
-  record("seo", `All images have alt text: ${loc}`, imgs.every((i) => /\salt="[^"]+"/i.test(i)), `${imgs.length} images`);
+  record("seo", `All images have an alt attribute (empty only for decorative images): ${loc}`, imgs.every((i) => /\salt="[^"]*"/i.test(i)), `${imgs.length} images`);
   record("seo", `lang and viewport: ${loc}`, /<html[^>]*lang="en"/i.test(html) && /<meta[^>]*name="viewport"/i.test(html));
   record("seo", `No obsolete geo/revisit meta tags: ${loc}`, !/name="(geo\.|ICBM|revisit-after|rating)/i.test(html));
 

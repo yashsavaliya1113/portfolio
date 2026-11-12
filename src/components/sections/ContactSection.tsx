@@ -25,8 +25,8 @@ export function ContactSection() {
     <section id="contact" className="border-t border-[var(--color-border)] py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading title="Contact" subtitle="Let's build something together." />
-        <div className="grid gap-12 lg:grid-cols-2">
-          <div className="animate-fade-up" style={{ animationFillMode: "both" }}>
+        <div className="grid gap-12 lg:grid-cols-2 lg:items-start">
+          <div className="relative z-20 animate-fade-up" style={{ animationFillMode: "both" }}>
             <h3 className="font-heading text-3xl font-bold tracking-tight">
               Let&apos;s work together
             </h3>
@@ -35,15 +35,26 @@ export function ContactSection() {
               opportunities to be part of your vision.
             </p>
             <div className="mt-8 space-y-4">
-              <a
-                href={`mailto:${siteConfig.links.email}`}
-                className="flex items-center gap-3 text-[var(--color-muted)] transition-colors hover:text-[var(--color-text)]"
-              >
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                  <Mail size={18} className="text-primary" />
-                </div>
-                <span>{siteConfig.links.email}</span>
-              </a>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                <a
+                  href={`mailto:${siteConfig.links.email}`}
+                  className="flex items-center gap-3 text-[var(--color-muted)] transition-colors hover:text-[var(--color-text)]"
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                    <Mail size={18} className="text-primary" aria-hidden="true" />
+                  </div>
+                  <span className="break-all">{siteConfig.links.email}</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={handleCopyEmail}
+                  aria-label={copied ? "Email address copied" : "Copy email address"}
+                  title="Copy email address"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-muted)] transition-colors hover:border-primary/50 hover:text-[var(--color-text)]"
+                >
+                  {copied ? <Check size={15} className="text-success" aria-hidden="true" /> : <Copy size={15} aria-hidden="true" />}
+                </button>
+              </div>
               <div className="flex items-center gap-3 text-[var(--color-muted)]">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                   <MapPin size={18} className="text-primary" />
@@ -80,14 +91,6 @@ export function ContactSection() {
                 <ArrowUpRight size={14} />
               </a>
               <ResumeDownload label="Download Resume" variant="primary" />
-              <button
-                type="button"
-                onClick={handleCopyEmail}
-                className="inline-flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-2.5 text-sm font-medium transition-all hover:border-primary/50"
-              >
-                {copied ? <Check size={14} className="text-success" /> : <Copy size={14} />}
-                {copied ? "Copied" : "Copy Email"}
-              </button>
             </div>
           </div>
           <div className="animate-fade-up rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6" style={{ animationDelay: "0.2s", animationFillMode: "both" }}>

@@ -19,12 +19,11 @@ export function SkillsSection() {
     <section id="skills" className="border-t border-[var(--color-border)] py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading title="Skills" subtitle="Technologies and tools I work with." />
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {skillCategories.map((category, catIndex) => (
+        <div className="columns-1 gap-5 sm:columns-2 lg:columns-3">
+          {skillCategories.map((category) => (
             <div
               key={category.title}
-              className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 hover:border-primary/30 transition-colors animate-fade-up"
-              style={{ animationDelay: `${catIndex * 0.05}s`, animationFillMode: "both" }}
+              className="mb-5 break-inside-avoid rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 hover:border-primary/30 transition-colors"
             >
               <div className="mb-3 flex items-center gap-2.5">
                 <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10 text-primary">
